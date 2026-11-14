@@ -498,7 +498,7 @@ async function loadApproved(){
   catch(e){ return; }
   const notes = window.YB_NOTES = window.YB_NOTES || {}, att = window.YB_ATTENDEES = window.YB_ATTENDEES || [], removed = {};
   for (const [ts,type,id,name,cls,msg,det,pub] of rows){
-    const t = (type||'').trim().toLowerCase(), date = (ts||'').split(' ')[0];
+    const t = (type||'').trim().toLowerCase(), n = parseFloat(ts), date = (!isNaN(n) && n > 40000) ? new Date(Math.round((n-25569)*86400000)).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'}) : (ts||'').split(' ')[0];
     if (t==='removal' && id) removed[id] = 1;
     else if (t==='note' && byId[id] && msg) (notes[id] = notes[id] || []).push({from:name, cls, text:msg, date});
     else if (t==='claim' && byId[id]) { FOUND[id] = 1; const d = kv(det); NOW[id] = {...d, msg};
