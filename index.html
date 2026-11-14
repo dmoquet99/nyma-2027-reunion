@@ -393,8 +393,9 @@ function formShell(p, kicker, title, intro, fieldsHtml, btn){
 }
 const inp = (id,label,opt={}) => `<label for="${id}">${label}${opt.ta?`<textarea id="${id}"></textarea>`:`<input id="${id}" type="${opt.type||'text'}"${opt.val?` value="${opt.val}"`:''}${opt.ac?` autocomplete="${opt.ac}"`:''}>`}</label>`;
 const sel = (id,label,opts) => `<label for="${id}">${label}<select id="${id}" style="background:#0d1528;border:1px solid #33405e;color:var(--ink);padding:9px 10px;font:inherit;border-radius:3px">${opts.map(o=>`<option>${o}</option>`).join('')}</select></label>`;
-const contactFields = () => inp('c_email','Your email (organizer only, never posted)',{type:'email',ac:'email'}) + inp('c_phone','Phone (optional, organizer only)',{type:'tel',ac:'tel'});
+const contactFields = () => inp('c_email','Email (optional, for reunion updates; never posted)',{type:'email',ac:'email'}) + inp('c_phone','Phone (optional, organizer only)',{type:'tel',ac:'tel'});
 const g = i => (document.getElementById(i)?.value || '').trim();
+const blank = () => ![...document.querySelectorAll('#f input:not([type=checkbox]), #f textarea')].some(e => e.value.trim());
 function done(msg){
   const out = document.getElementById('out'), f = document.getElementById('f');
   if (f) f.hidden = true;
@@ -417,7 +418,6 @@ function openForm(id, kind){
       sel('m_rsvp','Coming to the May 2027 reunion?',['Yes','Maybe','No']) + inp('m_city','Where you live now') + inp('m_work','What you do') +
       inp('m_link','Your LinkedIn, Facebook or other link') + inp('m_note','Anything for the class',{ta:1}) + contactFields(), 'Send it');
     bindForm(out => {
-      if (!emailOk(g('c_email'))) { out.innerHTML = '<p class="note">Add a valid email so we can send you reunion updates.</p>'; return; }
       const det = [['Coming',g('m_rsvp')],['City',g('m_city')],['Work',g('m_work')],['Link',g('m_link')]].filter(x=>x[1]).map(x=>x.join(': ')).join('\n');
       send({type:'claim', id:p.id, name:p.name, cls:p.cls, msg:g('m_note'), det, email:g('c_email'), phone:g('c_phone'), pub:'yes'},
         'Your card updates once the organizer approves it.' + (g('m_rsvp')!=='No' ? ' You\'ll also go on the Who\'s Coming list.' : ''));
@@ -427,8 +427,7 @@ function openForm(id, kind){
       inp('l_where','Where they are now (city, work, anything you know)',{ta:1}) + inp('l_link','A link to them, if you have one') +
       inp('l_you','Your name') + inp('l_cls','Your class year') + contactFields(), 'Send lead');
     bindForm(out => {
-      if (!g('l_where') && !g('l_link')) { out.innerHTML = '<p class="note">Tell us something about where they are.</p>'; return; }
-      if (!emailOk(g('c_email'))) { out.innerHTML = '<p class="note">Add a valid email so the organizer can follow up.</p>'; return; }
+      if (blank()) { out.innerHTML = '<p class="note">The form is empty.</p>'; return; }
       send({type:'lead', id:p.id, name:g('l_you'), cls:g('l_cls'), msg:g('l_where'), det:g('l_link'), email:g('c_email'), phone:g('c_phone'), pub:'no'},
         'The organizer will follow up on it.');
     });
@@ -453,8 +452,7 @@ function openNote(id){
       else out.innerHTML = '<p class="note">That\'s not it. Think back to the LET classroom.</p>';
       return;
     }
-    if (!g('n_from') || !g('n_text')) { out.innerHTML = '<p class="note">Add your name and a note.</p>'; return; }
-    if (!emailOk(g('c_email'))) { out.innerHTML = '<p class="note">Add a valid email so we can send you reunion updates.</p>'; return; }
+    if (!g('n_text')) { out.innerHTML = '<p class="note">The note is empty.</p>'; return; }
     send({type:'note', id:p.id, name:g('n_from'), cls:g('n_cls'), msg:g('n_text'), email:g('c_email'), phone:g('c_phone'), pub:'yes'},
       `It shows on ${esc(p.name.split(' ')[0])}'s wall once the organizer approves it.`);
   });
@@ -473,10 +471,9 @@ function openRsvp(){
     hint.innerHTML = p ? `<div class="maybe-row" style="border-style:solid">${p.portrait?`<img src="${p.portrait}" alt="">`:''}<div class="q"><b>You're in the 2002 Shrapnel.</b> Is this you: ${esc(p.name)}, Class of ${p.cls}?</div><div class="yn"><button class="btn pri" type="button" data-claim="${p.id}">Yes, use my card</button></div></div>` : ''; };
   ['r_first','r_last','r_cls'].forEach(i => document.getElementById(i).addEventListener('input', check));
   bindForm(out => {
-    if (!g('r_first') || !g('r_last') || !g('r_cls')) { out.innerHTML = '<p class="note">First name, last name and class year are required.</p>'; return; }
-    if (!emailOk(g('c_email'))) { out.innerHTML = '<p class="note">Add a valid email so we can send you reunion updates.</p>'; return; }
+    if (blank()) { out.innerHTML = '<p class="note">The form is empty.</p>'; return; }
     const pub = document.getElementById('r_pub').checked;
-    send({type:'rsvp', name:g('r_first')+' '+g('r_last'), cls:g('r_cls'), det:`Coming: ${g('r_rsvp')}`+(g('r_years')?`\nYears attended: ${g('r_years')}`:''), email:g('c_email'), phone:g('c_phone'), pub: pub?'yes':'no'},
+    send({type:'rsvp', name:(g('r_first')+' '+g('r_last')).trim(), cls:g('r_cls'), det:`Coming: ${g('r_rsvp')}`+(g('r_years')?`\nYears attended: ${g('r_years')}`:''), email:g('c_email'), phone:g('c_phone'), pub: pub?'yes':'no'},
       pub ? 'Your name goes on the Who\'s Coming list once the organizer confirms it.' : 'The organizer has your RSVP.');
   });
 }
@@ -488,8 +485,7 @@ function openOptout(id){
     (p ? '' : inp('o_name','Your name as it appears on the site') + inp('o_cls','Class year')) + inp('o_note','Anything else (optional)',{ta:1}) + contactFields(), 'Send request');
   if (!dlg.open) dlg.showModal();
   bindForm(out => {
-    if (!p && !g('o_name')) { out.innerHTML = '<p class="note">Tell us the name to remove.</p>'; return; }
-    if (!emailOk(g('c_email'))) { out.innerHTML = '<p class="note">Add an email so the organizer can confirm.</p>'; return; }
+    if (!p && blank()) { out.innerHTML = '<p class="note">The form is empty.</p>'; return; }
     send({type:'removal', id: p?p.id:'', name: p?p.name:g('o_name'), cls: p?p.cls:g('o_cls'), msg:g('o_note'), email:g('c_email'), phone:g('c_phone'), pub:'no'},
       'The organizer will take it down and confirm by email.');
   });
