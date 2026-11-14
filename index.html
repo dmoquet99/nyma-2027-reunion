@@ -274,6 +274,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
   <section id="v-faculty" hidden>
     <div class="bar"><input id="fq" type="search" placeholder="Search faculty and staff" aria-label="Search faculty and staff">
       <select id="fyb" aria-label="Yearbook" class="chip"><option value="">Both yearbooks</option><option value="2002">2002 Shrapnel</option><option value="2004">2004 Shrapnel</option></select>
+      <button class="chip" id="fall" aria-pressed="true">Everyone</button><button class="chip" id="fmem" aria-pressed="false">In Memoriam <span id="fmemN"></span></button>
       <p class="note" style="margin:0">The officers, teachers and staff who ran NYMA, from the 2002 and 2004 Shrapnel. Tap anyone to leave a note on their wall.</p></div>
     <div id="facList"></div>
   </section>
@@ -292,9 +293,9 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
 <dialog id="dlg" aria-labelledby="pName"><div style="position:relative"><button class="x" id="dlgX" aria-label="Close">×</button><div class="card" id="card"></div></div></dialog>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="data.js?v=14e80a05"></script>
-<script src="notes.js?v=14e80a05"></script>
-<script src="attendees.js?v=14e80a05"></script>
+<script src="data.js?v=52d81202"></script>
+<script src="notes.js?v=52d81202"></script>
+<script src="attendees.js?v=52d81202"></script>
 <script>
 const ORGANIZER_EMAIL = 'nyma.reunion2027@gmail.com'; // reunion inbox: set before sharing
 const D = window.YB;
@@ -682,6 +683,7 @@ document.getElementById('q').addEventListener('input', renderWall);
 document.getElementById('cls').addEventListener('change', renderWall);
 document.getElementById('yb').addEventListener('change', renderWall);
 document.getElementById('fq').addEventListener('input', renderFaculty);
+['fall','fmem'].forEach(id => document.getElementById(id).addEventListener('click', () => { document.getElementById('fmem').setAttribute('aria-pressed', id==='fmem'); document.getElementById('fall').setAttribute('aria-pressed', id==='fall'); renderFaculty(); }));
 document.getElementById('fyb').addEventListener('change', renderFaculty);
 document.getElementById('boxToggle').onclick = e => { showBoxes = !showBoxes; e.currentTarget.setAttribute('aria-pressed', showBoxes); renderSpread(); };
 
@@ -716,8 +718,9 @@ function ftile(p){
     <span class="meta"><span>${yrs} Shrapnel</span>${p.mem?'<span class="dot">In memoriam</span>':''}</span></div></button>`;
 }
 function renderFaculty(){
-  const q = norm(document.getElementById('fq').value||''), yb = document.getElementById('fyb').value;
-  const S = D.people.filter(p => p.staff && (!q || norm(p.name+' '+(p.role||'')+' '+p.staff).includes(q)) && (!yb || p.yrs.some(y=>y.y===yb)));
+  const q = norm(document.getElementById('fq').value||''), yb = document.getElementById('fyb').value, memOnly = document.getElementById('fmem').getAttribute('aria-pressed')==='true';
+  document.getElementById('fmemN').textContent = '('+D.people.filter(p=>p.staff&&p.mem).length+')';
+  const S = D.people.filter(p => p.staff && (!memOnly || p.mem) && (!q || norm(p.name+' '+(p.role||'')+' '+p.staff).includes(q)) && (!yb || p.yrs.some(y=>y.y===yb)));
   const rank = p => /Superintendent/.test(p.role)?0:/Headmaster/.test(p.role)&&!/Assistant/.test(p.role)?1:/Commandant(?! for)/.test(p.role)&&!/Deputy/.test(p.role)?0:/Assistant Headmaster/.test(p.role)?2:/Chair|Deputy|Senior Army|Principal|Registrar/.test(p.role)?3:/Superintendent|Commandant|Director/.test(p.role)?4:9;
   document.getElementById('facList').innerHTML = DEPTS.map(d => {
     const g = S.filter(p=>p.staff===d).sort((a,b)=> rank(a)-rank(b) || surname(a.name).localeCompare(surname(b.name)));
