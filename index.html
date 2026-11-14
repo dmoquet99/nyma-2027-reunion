@@ -292,9 +292,9 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
 <dialog id="dlg" aria-labelledby="pName"><div style="position:relative"><button class="x" id="dlgX" aria-label="Close">×</button><div class="card" id="card"></div></div></dialog>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="data.js"></script>
-<script src="notes.js"></script>
-<script src="attendees.js"></script>
+<script src="data.js?v=68678ba0"></script>
+<script src="notes.js?v=68678ba0"></script>
+<script src="attendees.js?v=68678ba0"></script>
 <script>
 const ORGANIZER_EMAIL = 'nyma.reunion2027@gmail.com'; // reunion inbox: set before sharing
 const D = window.YB;
@@ -722,7 +722,7 @@ function renderFaculty(){
   document.getElementById('facList').innerHTML = DEPTS.map(d => {
     const g = S.filter(p=>p.staff===d).sort((a,b)=> rank(a)-rank(b) || surname(a.name).localeCompare(surname(b.name)));
     return g.length ? `<h2 class="dept">${d.replace('Faculty','Faculty · Teachers')}<small>${g.length}</small></h2><div class="wall">${g.map(ftile).join('')}</div>` : '';
-  }).join('') || '<p class="note">No one by that name.</p>';
+  }).join('') || (D.people.some(p=>p.staff) ? '<p class="note">No one by that name.</p>' : '<p class="note">Loading the faculty list… If this stays empty, refresh the page.</p>');
 }
 function show(v){
   ['wall','book','find','coming','faculty'].forEach(x => document.getElementById('v-'+x).hidden = x!==v);
