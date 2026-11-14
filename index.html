@@ -64,6 +64,8 @@ select.chip{background:var(--navy-2);color:var(--ink)}
 .dot::before{content:"";width:7px;height:7px;border-radius:50%;background:#5b6683}
 .tile.mem img{filter:grayscale(1) contrast(1.05)}
 .tile.mem .dot::before{background:var(--paper)}
+.dot.found::before{background:var(--ok)}
+.dot.found{color:var(--ok)}
 .memline{margin:0 0 4px;font-weight:600}
 .memline + .note{margin:0 0 10px}
 
@@ -247,7 +249,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
 </main>
 <footer class="site">
   <div>NYMA Reunion · May 2027 · Questions, RSVPs and leads: <b>nyma.reunion2027@gmail.com</b></div>
-  <div>Want your name or photo removed from this site? Email the organizer at nyma.reunion2027@gmail.com with the subject "Remove my info" and it will be taken down. <button class="btn" data-optout="">Write the removal email</button></div>
+  <div>Want your name or photo removed from this site? <button class="btn" data-optout="">Request removal</button></div>
   <div>Portraits and photos are from the 2002 Shrapnel yearbook.</div>
 </footer>
 
@@ -274,25 +276,26 @@ function esc(s){ return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'
 function stats(){
   document.getElementById('sPeople').textContent = D.people.length;
   document.getElementById('sTotal').textContent = D.people.filter(p=>!p.mem).length;
+  document.getElementById('sFound').textContent = D.people.filter(p=>!p.mem && FOUND[p.id]).length;
   
 }
 
 function tile(p){
   const n = tagged(p.id).length;
-  const status = p.mem ? 'In memoriam' : 'Not found yet';
+  const status = p.mem ? 'In memoriam' : FOUND[p.id] ? 'Found' : 'Not found yet';
   const img = p.portrait ? `<img src="${p.portrait}" alt="${esc(p.name)}, yearbook portrait" loading="lazy">` : `<div class="noimg">Photo not available in the book</div>`;
   return `<button class="tile${p.mem?' mem':''}" data-id="${p.id}">${img}
     <div class="cap"><span class="rk">${p.rank ? p.rank+' · ' : ''}Class of ${p.cls}</span><span class="nm">${esc(p.name)}</span>
-    <span class="meta"><span>In ${n} photo${n===1?'':'s'}${((window.YB_NOTES||{})[p.id]||[]).length?' · '+(window.YB_NOTES[p.id].length)+' notes':''}</span><span class="dot">${status}</span></span></div></button>`;
+    <span class="meta"><span>In ${n} photo${n===1?'':'s'}${((window.YB_NOTES||{})[p.id]||[]).length?' · '+(window.YB_NOTES[p.id].length)+' notes':''}</span><span class="dot${FOUND[p.id]&&!p.mem?' found':''}">${status}</span></span></div></button>`;
 }
 let filter='all';
 function renderWall(){
   const q = document.getElementById('q').value.trim().toLowerCase();
   const cl = document.getElementById('cls').value;
-  const list = D.people.filter(p => (!cl || p.cls===cl) && (!q || p.name.toLowerCase().includes(q)) && (filter==='all' || (filter==='missing' && !p.mem) || (filter==='mem' && p.mem)));
+  const list = D.people.filter(p => (!cl || p.cls===cl) && (!q || p.name.toLowerCase().includes(q)) && (filter==='all' || (filter==='missing' && !p.mem && !FOUND[p.id]) || (filter==='found' && FOUND[p.id] && !p.mem) || (filter==='mem' && p.mem)));
   document.getElementById('wall').innerHTML = list.length ? list.map(tile).join('') : `<p class="note">${filter==='found' ? 'No one has been found yet. Once a classmate claims their entry or a lead is confirmed, they show up here with a current photo next to their 2002 portrait.' : 'No one by that name.'}</p>`;
 }
-function renderFind(){ document.getElementById('findWall').innerHTML = D.people.filter(p=>!p.mem).map(tile).join(''); }
+function renderFind(){ document.getElementById('findWall').innerHTML = D.people.filter(p=>!p.mem && !FOUND[p.id]).map(tile).join(''); }
 
 /* Book */
 let curPage = D.pages[0], showBoxes = true;
@@ -329,7 +332,7 @@ function openCard(id){
       <div class="bio"><h3>Then</h3>${bioHtml(p)}</div>
       ${p.mem ? `<div><h3>In Memoriam</h3><p class="memline">${esc(p.mem.years)}</p><p class="note">Obituary: ${esc(p.mem.src)}</p>
         <div class="actions"><a class="btn pri" href="${p.mem.obit}" target="_blank" rel="noopener">Read obituary</a></div></div>`
-      : `<div><h3>Now</h3><p class="ph" style="margin:0 0 10px">Not found yet.</p>
+      : `<div><h3>Now</h3>${nowHtml(id)}
         <div class="actions"><button class="btn pri" data-act="me">This is me · I’m coming in May</button><button class="btn" data-act="lead">I know where they are</button></div></div>`}
     </div>
     <div class="sec"><h3>${p.mem ? 'Remembering' : 'Wall'} · <b>${notes.length}</b> note${notes.length===1?'':'s'}</h3>
@@ -350,29 +353,74 @@ function openCard(id){
   if (!dlg.open) dlg.showModal();
 }
 let composed = '';
+function nowHtml(id){
+  const n = NOW[id];
+  if (n) { const rows = [['Lives in',n.City],['Does',n.Work]].filter(r=>r[1]);
+    const link = n.Link && /^https?:\/\//i.test(n.Link) ? `<p style="margin:.4em 0 0"><a href="${esc(n.Link)}" target="_blank" rel="noopener nofollow">Profile link</a></p>` : (n.Link?`<p style="margin:.4em 0 0">${esc(n.Link)}</p>`:'');
+    return `${rows.length?`<dl style="display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 6px">${rows.map(([k,v])=>`<dt style="color:var(--muted)">${k}</dt><dd style="margin:0">${esc(v)}</dd>`).join('')}</dl>`:''}${link}${n.msg?`<p style="margin:.5em 0 10px;font-style:italic">"${esc(n.msg)}"</p>`:'<div style="height:10px"></div>'}`; }
+  if (FOUND[id]) return '<p style="margin:0 0 10px">Located by a classmate. The organizer is reaching out.</p>';
+  return '<p class="ph" style="margin:0 0 10px">Not found yet.</p>';
+}
+const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScxMJjYfBTFSDXo49xTlJYrUJmMVvdPy5AO_PXXGZAQlUGXtA/formResponse';
+const FE = {type:'entry.418789659', id:'entry.586086303', name:'entry.631628868', cls:'entry.1511427373', msg:'entry.2071929603', det:'entry.399938544', email:'entry.1558039808', phone:'entry.1375405192', pub:'entry.1002765891'};
+const APPROVED_CSV = ''; // published "Sheet1" CSV link: approved rows only, no email/phone
+async function submitEntry(v){
+  const body = new URLSearchParams();
+  Object.entries(v).forEach(([k,val]) => { if (FE[k] && val) body.append(FE[k], val); });
+  await fetch(FORM_URL, {method:'POST', mode:'no-cors', body});
+}
+const emailOk = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+function formShell(p, kicker, title, intro, fieldsHtml, btn){
+  const left = p ? `<div class="left">${p.portrait?`<img src="${p.portrait}" alt="">`:''}<div class="note">${esc(p.name)}, Class of ${p.cls}</div></div>`
+                 : `<div class="left"><div class="noimg" style="aspect-ratio:auto;padding:24px 10px">All NYMA cadets welcome, any class, any length of stay.</div></div>`;
+  return `${left}<div class="right"><div><div class="rkl">${kicker}</div><h2 id="pName">${esc(title)}</h2></div>
+    ${intro?`<p class="note" style="margin:0">${intro}</p>`:''}
+    <form class="form" id="f">${fieldsHtml}
+      <div class="actions"><button class="btn pri" type="submit" id="f_btn">${btn}</button>${p?'<button class="btn" type="button" data-back="1">Back</button>':''}</div></form>
+    <div id="out"></div></div>`;
+}
+const inp = (id,label,opt={}) => `<label for="${id}">${label}${opt.ta?`<textarea id="${id}"></textarea>`:`<input id="${id}" type="${opt.type||'text'}"${opt.val?` value="${opt.val}"`:''}${opt.ac?` autocomplete="${opt.ac}"`:''}>`}</label>`;
+const sel = (id,label,opts) => `<label for="${id}">${label}<select id="${id}" style="background:#0d1528;border:1px solid #33405e;color:var(--ink);padding:9px 10px;font:inherit;border-radius:3px">${opts.map(o=>`<option>${o}</option>`).join('')}</select></label>`;
+const contactFields = () => inp('c_email','Your email (organizer only, never posted)',{type:'email',ac:'email'}) + inp('c_phone','Phone (optional, organizer only)',{type:'tel',ac:'tel'});
+const g = i => (document.getElementById(i)?.value || '').trim();
+function done(msg){
+  const out = document.getElementById('out'), f = document.getElementById('f');
+  if (f) f.hidden = true;
+  out.innerHTML = `<p class="sendto" style="font-size:16px"><b>Thanks, it's in.</b> ${msg}</p>`;
+}
+async function send(v, msg){
+  const out = document.getElementById('out'), b = document.getElementById('f_btn');
+  b.disabled = true; b.textContent = 'Sending…';
+  try { await submitEntry(v); done(msg); }
+  catch(e){ b.disabled = false; b.textContent = 'Try again'; out.innerHTML = `<p class="note">That didn't go through. Check your connection and try again, or email ${esc(ORGANIZER_EMAIL)}.</p>`; }
+}
+function bindForm(handler){
+  document.getElementById('f').addEventListener('submit', ev => { ev.preventDefault(); handler(document.getElementById('out')); });
+}
 function openForm(id, kind){
-  const p = byId[id], me = kind==='me';
   if (kind==='note') return openNote(id);
-  const fields = me
-    ? [['f_rsvp','Coming to the May 2027 reunion? (yes / maybe / no)'],['f_city','Where you live now'],['f_work','What you do'],['f_link','Your LinkedIn, Facebook or other link'],['f_contact','Best way to reach you (email or phone)'],['f_note','Anything for the class','ta']]
-    : [['f_where','Where they are now (city, work, anything you know)','ta'],['f_link','A link to them, if you have one (LinkedIn, Facebook, news)'],['f_you','Your name'],['f_contact','How the organizers can reach you']];
-  document.getElementById('card').innerHTML = `<div class="left"><img src="${p.portrait}" alt=""><div class="note">${esc(p.rank+' '+p.name)}</div></div>
-  <div class="right"><div><div class="rkl">${me?'Claim your entry':'Send a lead'}</div><h2 id="pName">${esc(p.name)}</h2></div>
-  <form class="form" id="f">${fields.map(([i,l,t])=>`<label for="${i}">${l}${t?`<textarea id="${i}"></textarea>`:`<input id="${i}" type="text">`}</label>`).join('')}
-    <div class="actions"><button class="btn pri" type="submit">Send it</button><button class="btn" type="button" data-back="1">Back</button></div></form>
-  <div id="out"></div></div>`;
-  document.getElementById('f').addEventListener('submit', ev => {
-    ev.preventDefault();
-    const v = Object.fromEntries(fields.map(([i,l])=>[l, document.getElementById(i).value.trim()]));
-    const subj = me ? `NYMA Reunion May 2027 (Class of ${p.cls}): This is me, ${p.name}` : `NYMA Reunion May 2027 (Class of ${p.cls}): lead on ${p.name}`;
-    composed = subj + '\n\n' + Object.entries(v).filter(([,x])=>x).map(([l,x])=>`${l}: ${x}`).join('\n');
-    const out = document.getElementById('out');
-    if (!ORGANIZER_EMAIL) { out.innerHTML = '<p class="note">The reunion inbox isn\'t set up yet. Copy your message and hold onto it.</p><div class="actions"><button class="btn" data-copy="msg">Copy message</button></div>'; return; }
-    const href = 'mailto:'+ORGANIZER_EMAIL+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(composed.split('\n').slice(2).join('\n'));
-    out.innerHTML = `<p class="sendto">Your message is ready. It goes to <b>${esc(ORGANIZER_EMAIL)}</b>.</p>
-      <div class="actions"><a class="btn pri" href="${href}" target="_blank" rel="noopener">Open in my email</a><button class="btn" data-copy="msg">Copy message</button><button class="btn" data-copy="addr">Copy address</button></div>
-      <p class="note">If your email app doesn't open, copy the message and the address and send it yourself.</p>`;
-  });
+  const p = byId[id], me = kind==='me';
+  if (me) {
+    document.getElementById('card').innerHTML = formShell(p, 'Claim your entry', p.name, 'Your city, work and link show on your card once the organizer approves. Email and phone stay private.',
+      sel('m_rsvp','Coming to the May 2027 reunion?',['Yes','Maybe','No']) + inp('m_city','Where you live now') + inp('m_work','What you do') +
+      inp('m_link','Your LinkedIn, Facebook or other link') + inp('m_note','Anything for the class',{ta:1}) + contactFields(), 'Send it');
+    bindForm(out => {
+      if (!emailOk(g('c_email'))) { out.innerHTML = '<p class="note">Add a valid email so we can send you reunion updates.</p>'; return; }
+      const det = [['Coming',g('m_rsvp')],['City',g('m_city')],['Work',g('m_work')],['Link',g('m_link')]].filter(x=>x[1]).map(x=>x.join(': ')).join('\n');
+      send({type:'claim', id:p.id, name:p.name, cls:p.cls, msg:g('m_note'), det, email:g('c_email'), phone:g('c_phone'), pub:'yes'},
+        'Your card updates once the organizer approves it.' + (g('m_rsvp')!=='No' ? ' You\'ll also go on the Who\'s Coming list.' : ''));
+    });
+  } else {
+    document.getElementById('card').innerHTML = formShell(p, 'Send a lead', p.name, 'Leads go only to the organizer. Nothing you write here is posted.',
+      inp('l_where','Where they are now (city, work, anything you know)',{ta:1}) + inp('l_link','A link to them, if you have one') +
+      inp('l_you','Your name') + inp('l_cls','Your class year') + contactFields(), 'Send lead');
+    bindForm(out => {
+      if (!g('l_where') && !g('l_link')) { out.innerHTML = '<p class="note">Tell us something about where they are.</p>'; return; }
+      if (!emailOk(g('c_email'))) { out.innerHTML = '<p class="note">Add a valid email so the organizer can follow up.</p>'; return; }
+      send({type:'lead', id:p.id, name:g('l_you'), cls:g('l_cls'), msg:g('l_where'), det:g('l_link'), email:g('c_email'), phone:g('c_phone'), pub:'no'},
+        'The organizer will follow up on it.');
+    });
+  }
 }
 function bioHtml(p){
   const b = p.bio;
@@ -382,79 +430,89 @@ function bioHtml(p){
 }
 function openNote(id){
   const p = byId[id];
-  document.getElementById('card').innerHTML = `<div class="left">${p.portrait?`<img src="${p.portrait}" alt="">`:''}<div class="note">${esc(p.name)}, Class of ${p.cls}</div></div>
-  <div class="right"><div><div class="rkl">Leave a note</div><h2 id="pName">${esc(p.name)}</h2></div>
-  <p class="note" style="margin:0">Notes go to the reunion organizer and appear on this wall once approved. Everyone with the link can read them.</p>
-  <form class="form" id="nf">
-    <label for="n_q">NYMA check: who was the Senior LET Instructor?<input id="n_q" type="text" autocomplete="off"></label>
-    <div id="n_rest" hidden style="display:grid;gap:10px">
-      <label for="n_from">Your name<input id="n_from" type="text"></label>
-      <label for="n_cls">Your class year<input id="n_cls" type="text" inputmode="numeric"></label>
-      <label for="n_text">Your note${p.mem?' or memory':''}<textarea id="n_text"></textarea></label>
-    </div>
-    <div class="actions"><button class="btn pri" type="submit" id="n_btn">Check</button><button class="btn" type="button" data-back="1">Back</button></div>
-  </form><div id="out"></div></div>`;
+  document.getElementById('card').innerHTML = formShell(p, 'Leave a note', p.name, 'Notes appear on this wall once the organizer approves them. Everyone can read them.',
+    inp('n_q','NYMA check: who was the Senior LET Instructor?') +
+    `<div id="n_rest" hidden style="display:grid;gap:10px">${inp('n_from','Your name',{ac:'name'})}${inp('n_cls','Your class year')}${inp('n_text','Your note'+(p.mem?' or memory':''),{ta:1})}${contactFields()}</div>`, 'Check');
   let ok = false;
-  document.getElementById('nf').addEventListener('submit', ev => {
-    ev.preventDefault();
-    const out = document.getElementById('out');
+  bindForm(out => {
     if (!ok) {
-      const a = document.getElementById('n_q').value.toLowerCase().replace(/[^a-z]/g,'');
-      if (/brand$/.test(a) && /^(col|colonel|ltc|)brand$/.test(a)) { ok = true; document.getElementById('n_rest').hidden = false; document.getElementById('n_q').disabled = true; document.getElementById('n_btn').textContent = 'Send note'; out.innerHTML=''; document.getElementById('n_from').focus(); }
+      const a = g('n_q').toLowerCase().replace(/[^a-z]/g,'');
+      if (/^(col|colonel|ltc|)brand$/.test(a)) { ok = true; document.getElementById('n_rest').hidden = false; document.getElementById('n_q').disabled = true; document.getElementById('f_btn').textContent = 'Post note'; out.innerHTML=''; document.getElementById('n_from').focus(); }
       else out.innerHTML = '<p class="note">That\'s not it. Think back to the LET classroom.</p>';
       return;
     }
-    const from = document.getElementById('n_from').value.trim(), cls = document.getElementById('n_cls').value.trim(), text = document.getElementById('n_text').value.trim();
-    if (!from || !text) { out.innerHTML = '<p class="note">Add your name and a note.</p>'; return; }
-    const subj = `WALL NOTE for ${p.name} (${p.id})`;
-    composed = subj + '\n\nFrom: ' + from + (cls?'\nClass: '+cls:'') + '\nNote:\n' + text;
-    const href = 'mailto:'+ORGANIZER_EMAIL+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(composed.split('\n').slice(2).join('\n'));
-    out.innerHTML = `<p class="sendto">Ready. It goes to <b>${esc(ORGANIZER_EMAIL)}</b> and shows on ${esc(p.name.split(' ')[0])}'s wall once approved.</p>
-      <div class="actions"><a class="btn pri" href="${href}" target="_blank" rel="noopener">Open in my email</a><button class="btn" data-copy="msg">Copy note</button><button class="btn" data-copy="addr">Copy address</button></div>`;
+    if (!g('n_from') || !g('n_text')) { out.innerHTML = '<p class="note">Add your name and a note.</p>'; return; }
+    if (!emailOk(g('c_email'))) { out.innerHTML = '<p class="note">Add a valid email so we can send you reunion updates.</p>'; return; }
+    send({type:'note', id:p.id, name:g('n_from'), cls:g('n_cls'), msg:g('n_text'), email:g('c_email'), phone:g('c_phone'), pub:'yes'},
+      `It shows on ${esc(p.name.split(' ')[0])}'s wall once the organizer approves it.`);
   });
   document.getElementById('n_q').focus();
 }
-function mailBlock(subj, body, note){
-  composed = subj + '\n\n' + body;
-  const href = 'mailto:'+ORGANIZER_EMAIL+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
-  return `<p class="sendto">${note} It goes to <b>${esc(ORGANIZER_EMAIL)}</b>.</p>
-    <div class="actions"><a class="btn pri" href="${href}" target="_blank" rel="noopener">Open in my email</a><button class="btn" data-copy="msg">Copy message</button><button class="btn" data-copy="addr">Copy address</button></div>
-    <p class="note">If your email app doesn't open, copy the message and the address and send it yourself.</p>`;
-}
 function openRsvp(){
-  document.getElementById('card').innerHTML = `<div class="left"><div class="noimg" style="aspect-ratio:auto;padding:24px 10px">All NYMA cadets welcome, any class, any length of stay.</div></div>
-  <div class="right"><div><div class="rkl">RSVP · Reunion May 2027</div><h2 id="pName">Count me in</h2></div>
-  <p class="note" style="margin:0">In the 2002 book? Find yourself with the search box and use "This is me" on your card instead, so your RSVP is tied to your photo. Everyone else, use this form.</p>
-  <form class="form" id="rf">
-    <label for="r_first">First name<input id="r_first" type="text" autocomplete="given-name"></label>
-    <label for="r_last">Last name<input id="r_last" type="text" autocomplete="family-name"></label>
-    <label for="r_cls">Class year (the year you graduated or would have)<input id="r_cls" type="text" inputmode="numeric"></label>
-    <label for="r_years">Years you attended NYMA (optional)<input id="r_years" type="text"></label>
-    <label for="r_rsvp">Coming in May? (yes / maybe)<input id="r_rsvp" type="text" value="yes"></label>
-    <label for="r_contact">Email or phone (organizer only, never posted)<input id="r_contact" type="text"></label>
-    <label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input id="r_pub" type="checkbox" checked style="width:auto"> Show my name and class year on the public list of expected attendees</label>
-    <div class="actions"><button class="btn pri" type="submit">Send RSVP</button></div>
-  </form><div id="out"></div></div>`;
   delete dlg.dataset.id;
+  document.getElementById('card').innerHTML = formShell(null, 'RSVP · Reunion May 2027', 'Count me in',
+    'In the 2002 book? Find yourself with the search box and use "This is me" on your card instead, so your RSVP is tied to your photo.',
+    inp('r_first','First name',{ac:'given-name'}) + inp('r_last','Last name',{ac:'family-name'}) + inp('r_cls','Class year (the year you graduated or would have)') +
+    inp('r_years','Years you attended NYMA (optional)') + sel('r_rsvp','Coming in May?',['Yes','Maybe']) + contactFields() +
+    `<label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input id="r_pub" type="checkbox" checked style="width:auto"> Show my name and class year on the public list of expected attendees</label>`, 'Send RSVP');
   if (!dlg.open) dlg.showModal();
-  document.getElementById('rf').addEventListener('submit', ev => {
-    ev.preventDefault();
-    const g = i => document.getElementById(i).value.trim();
-    const out = document.getElementById('out');
+  bindForm(out => {
     if (!g('r_first') || !g('r_last') || !g('r_cls')) { out.innerHTML = '<p class="note">First name, last name and class year are required.</p>'; return; }
+    if (!emailOk(g('c_email'))) { out.innerHTML = '<p class="note">Add a valid email so we can send you reunion updates.</p>'; return; }
     const pub = document.getElementById('r_pub').checked;
-    const subj = `RSVP May 2027: ${g('r_first')} ${g('r_last')}, Class of ${g('r_cls')}`;
-    const body = `First name: ${g('r_first')}\nLast name: ${g('r_last')}\nClass year: ${g('r_cls')}\nYears attended: ${g('r_years')}\nComing: ${g('r_rsvp')}\nContact (private): ${g('r_contact')}\nShow on public list: ${pub?'yes':'no'}\nIn the 2002 book: not listed`;
-    out.innerHTML = mailBlock(subj, body, 'Your RSVP is ready.' + (pub ? ' Your name goes on the public list once the organizer confirms it.' : ''));
+    send({type:'rsvp', name:g('r_first')+' '+g('r_last'), cls:g('r_cls'), det:`Coming: ${g('r_rsvp')}`+(g('r_years')?`\nYears attended: ${g('r_years')}`:''), email:g('c_email'), phone:g('c_phone'), pub: pub?'yes':'no'},
+      pub ? 'Your name goes on the Who\'s Coming list once the organizer confirms it.' : 'The organizer has your RSVP.');
   });
 }
 function openOptout(id){
   const p = id ? byId[id] : null;
-  const subj = 'Remove my info' + (p ? `: ${p.name}, Class of ${p.cls}` : '');
-  const body = p ? `Please remove my name, photo and any notes about me from the NYMA Reunion site.\nEntry: ${p.name} (${p.id})\nMy name:\nHow to reach me:` : `Please remove my name and photo from the NYMA Reunion site.\nMy name as it appears on the site:\nClass year:\nHow to reach me:`;
-  document.getElementById('card').innerHTML = `<div class="left"></div><div class="right"><div><div class="rkl">Opt out</div><h2 id="pName">Remove my info</h2></div>
-    <p class="note" style="margin:0">Send this to the organizer and your entry will be taken off the site.</p><div id="out">${mailBlock(subj, body, 'Your removal request is ready.')}</div></div>`;
+  if (!p) delete dlg.dataset.id;
+  document.getElementById('card').innerHTML = formShell(p, 'Opt out', 'Remove my info',
+    'The organizer reviews this and takes your name, photo and notes off the site.',
+    (p ? '' : inp('o_name','Your name as it appears on the site') + inp('o_cls','Class year')) + inp('o_note','Anything else (optional)',{ta:1}) + contactFields(), 'Send request');
   if (!dlg.open) dlg.showModal();
+  bindForm(out => {
+    if (!p && !g('o_name')) { out.innerHTML = '<p class="note">Tell us the name to remove.</p>'; return; }
+    if (!emailOk(g('c_email'))) { out.innerHTML = '<p class="note">Add an email so the organizer can confirm.</p>'; return; }
+    send({type:'removal', id: p?p.id:'', name: p?p.name:g('o_name'), cls: p?p.cls:g('o_cls'), msg:g('o_note'), email:g('c_email'), phone:g('c_phone'), pub:'no'},
+      'The organizer will take it down and confirm by email.');
+  });
+}
+
+/* Approved submissions from the organizer's sheet */
+const FOUND = {}, NOW = {};
+function parseCSV(t){
+  const rows=[]; let row=[], f='', q=false;
+  for (let i=0;i<t.length;i++){ const c=t[i];
+    if (q){ if (c==='"'){ if (t[i+1]==='"'){ f+='"'; i++; } else q=false; } else f+=c; }
+    else if (c==='"') q=true; else if (c===','){ row.push(f); f=''; }
+    else if (c==='\n'){ row.push(f); rows.push(row); row=[]; f=''; } else if (c!=='\r') f+=c; }
+  if (f || row.length){ row.push(f); rows.push(row); }
+  return rows;
+}
+function kv(s){ return Object.fromEntries((s||'').split('\n').map(l=>l.split(/:\s*/)).filter(x=>x[1]).map(([k,...v])=>[k.trim(),v.join(':').trim()])); }
+async function loadApproved(){
+  if (!APPROVED_CSV) return;
+  let rows;
+  try { const r = await fetch(APPROVED_CSV + (APPROVED_CSV.includes('?')?'&':'?') + 't=' + Date.now()); rows = parseCSV(await r.text()).slice(1); }
+  catch(e){ return; }
+  const notes = window.YB_NOTES = window.YB_NOTES || {}, att = window.YB_ATTENDEES = window.YB_ATTENDEES || [], removed = {};
+  for (const [ts,type,id,name,cls,msg,det,pub] of rows){
+    const t = (type||'').trim().toLowerCase(), date = (ts||'').split(' ')[0];
+    if (t==='removal' && id) removed[id] = 1;
+    else if (t==='note' && byId[id] && msg) (notes[id] = notes[id] || []).push({from:name, cls, text:msg, date});
+    else if (t==='claim' && byId[id]) { FOUND[id] = 1; const d = kv(det); NOW[id] = {...d, msg};
+      if ((d.Coming||'').toLowerCase()!=='no') att.push({id, name:byId[id].name, cls:byId[id].cls, note:(d.Coming||'').toLowerCase()==='maybe'?'maybe':''}); }
+    else if (t==='lead' && byId[id]) FOUND[id] = FOUND[id] || 'lead';
+    else if (t==='rsvp' && (pub||'').toLowerCase()==='yes' && name) { const d = kv(det); att.push({name, cls, note:(d.Coming||'').toLowerCase()==='maybe'?'maybe':''}); }
+  }
+  if (Object.keys(removed).length){
+    D.people = D.people.filter(p => !removed[p.id]); D.faces = D.faces.filter(f => !removed[f.w]);
+    Object.keys(removed).forEach(k => delete byId[k]);
+  }
+  stats(); renderWall(); renderFind();
+  if (!document.getElementById('v-coming').hidden) renderComing();
+  if (dlg.open && dlg.dataset.id && byId[dlg.dataset.id] && !document.getElementById('f')) openCard(dlg.dataset.id);
 }
 function renderComing(){
   const A = window.YB_ATTENDEES || [];
@@ -530,6 +588,7 @@ function route(){
 window.addEventListener('hashchange', route);
 curPage = '9741';
 stats(); renderWall(); renderFind(); route();
+loadApproved();
 </script>
 </body>
 </html>
