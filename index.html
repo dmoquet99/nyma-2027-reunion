@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NYMA Reunion May 2027</title>
-<meta name="description" content="We're beating the bushes for lost NYMA cadets. Find yourself in the 2002 Shrapnel, claim your card and RSVP for the May 2027 reunion.">
+<meta name="description" content="We're beating the bushes for lost NYMA cadets. Find yourself in the 2002 and 2004 Shrapnel, claim your card and RSVP for the May 2027 reunion.">
 <meta property="og:title" content="NYMA Reunion · May 2027">
-<meta property="og:description" content="We're beating the bushes for lost NYMA cadets. Find yourself in the 2002 Shrapnel, claim your card, RSVP. One year or four, you're welcome.">
+<meta property="og:description" content="We're beating the bushes for lost NYMA cadets. Find yourself in the 2002 and 2004 Shrapnel, claim your card, RSVP. One year or four, you're welcome.">
 <meta property="og:image" content="https://nyma2027.com/og.png">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta property="og:url" content="https://nyma2027.com/">
@@ -104,6 +104,12 @@ dialog::backdrop{background:rgba(5,9,18,.75)}
 .card{display:grid;grid-template-columns:240px minmax(0,1fr);max-height:92vh}
 .card .left{background:#0d1528;padding:20px;display:flex;flex-direction:column;gap:12px}
 .card .left img{width:100%;border-radius:3px;border:1px solid #33405e}
+.tl{display:grid;gap:6px}.tl h3{margin:4px 0 2px}
+.tl-row{display:flex;gap:10px;align-items:center;text-align:left;background:transparent;border:1px solid #33405e;border-radius:4px;padding:6px;color:var(--ink);font:inherit;cursor:pointer}
+.tl-row.on{border-color:var(--brass);background:rgba(200,169,94,.08)}
+.card .left .tl-row img{width:44px;height:55px;object-fit:cover;border-radius:2px}
+.tl-row span{display:grid;gap:1px;font-size:13.5px}.tl-row small{color:var(--muted);font-size:12px}
+.ybadge{color:var(--brass)}
 .card .right{padding:22px 26px;overflow:auto;display:flex;flex-direction:column;gap:22px}
 .card h2{font-family:var(--display);font-weight:800;font-size:40px;line-height:1;margin:0;text-transform:uppercase;text-wrap:balance}
 .card .rkl{font-family:var(--display);font-weight:600;letter-spacing:.1em;color:var(--brass);font-size:16px}
@@ -197,7 +203,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
     <div class="splash-grid">
       <div><h3>The weekend</h3><p>Details on room blocks and the itinerary will be shared as time permits. RSVP now so we know to count you in.</p></div>
       <div><h3>Regiment of Graduates</h3><p>We're re-establishing the Regiment of Graduates. More information is coming soon.</p></div>
-      <div><h3>Not in the 2002 book?</h3><p>You're still invited. RSVP with your name and class year and you'll go on the list of expected attendees.</p></div>
+      <div><h3>Not in the yearbooks?</h3><p>You're still invited. RSVP with your name and class year and you'll go on the list of expected attendees.</p></div>
     </div>
     <div class="actions"><button class="btn pri big" data-rsvp="1">RSVP for May</button><a class="btn big" href="#coming">See who's coming</a><button class="btn big" data-focus="jump">Find yourself in the book</button></div>
   </div>
@@ -205,18 +211,18 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
 
 <section class="hero" id="hero">
   <div>
-    <h1 class="sub">Find a cadet <em>in the 2002 Shrapnel</em></h1>
+    <h1 class="sub">Find a cadet <em>in the Shrapnel</em></h1>
     <div class="find" role="search">
       <label for="jump" class="sr">Find a cadet</label>
       <input id="jump" type="search" placeholder="Find a cadet by name" autocomplete="off" aria-controls="jumpList" aria-expanded="false">
       <ul id="jumpList" role="listbox" hidden></ul>
     </div>
-    <p>Every cadet with a portrait in the 2002 Shrapnel is here: the Class of 2002 and the classes of 2003 through 2007. Find yourself in the old photos, tell us you're coming, and help track down everyone else so they're there in May.</p>
+    <p>Every cadet with a portrait in the 2002 and 2004 Shrapnel yearbooks is here, from the Class of 2002 through the Class of 2009. Cadets who appear in both books have one card with both years. Find yourself in the old photos, tell us you're coming, and help track down everyone else so they're there in May.</p>
   </div>
   <div class="stats" aria-label="Progress">
     <div class="stat gold"><b id="sFound">0</b><span>of <span id="sTotal">270</span> found</span></div>
-    <div class="stat"><b>May</b><span>2027 reunion · 25 years for the Class of 2002</span></div>
-    <div class="stat"><b id="sPeople">273</b><span>cadets in the book</span></div>
+    <div class="stat"><b>May</b><span>2027 reunion · all classes welcome</span></div>
+    <div class="stat"><b id="sPeople">273</b><span>cadets in the yearbooks</span></div>
   </div>
 </section>
 
@@ -224,7 +230,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
   <section id="v-wall" hidden>
     <div class="bar">
       <input id="q" type="search" placeholder="Search a name" aria-label="Search a name">
-      <select id="cls" aria-label="Class" class="chip"><option value="">All classes</option><option>2002</option><option>2003</option><option>2004</option><option>2005</option><option>2006</option><option>2007</option></select>
+      <select id="cls" aria-label="Class" class="chip"><option value="">All classes</option><option>2002</option><option>2003</option><option>2004</option><option>2005</option><option>2006</option><option>2007</option><option>2008</option><option>2009</option></select><select id="yb" aria-label="Yearbook" class="chip"><option value="">Both yearbooks</option><option value="2002">2002 Shrapnel</option><option value="2004">2004 Shrapnel</option><option value="both">In both books</option></select>
       <button class="chip" data-f="all" aria-pressed="true">Everyone</button>
       <button class="chip" data-f="found" aria-pressed="false">Found</button>
       <button class="chip" data-f="missing" aria-pressed="false">Still looking</button>
@@ -236,11 +242,12 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
   <section id="v-book" hidden>
     <div class="bar" style="justify-content:space-between">
       <div class="legend">
-        <span><i class="sw"></i>Tagged senior: tap to open</span>
+        <span><i class="sw"></i>Tagged cadet: tap to open</span>
         <span><i class="sw d"></i>Possible match: tap to confirm</span>
       </div>
       <button class="chip" id="boxToggle" aria-pressed="true">Show face tags</button>
     </div>
+    <div class="bar" style="padding-top:0"><span class="note" style="margin:0">Yearbook:</span><button class="chip" data-book="2002" aria-pressed="false">2002 Shrapnel</button><button class="chip" data-book="2004" aria-pressed="false">2004 Shrapnel</button></div>
     <div class="book">
       <div class="spread" id="spread"></div>
       <div class="strip" id="strip" aria-label="Pages"></div>
@@ -260,7 +267,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
 <footer class="site">
   <div>NYMA Reunion · May 2027 · Questions, RSVPs and leads: <b>nyma.reunion2027@gmail.com</b></div>
   <div>Want your name or photo removed from this site? <button class="btn" data-optout="">Request removal</button></div>
-  <div>Portraits and photos are from the 2002 Shrapnel yearbook.</div>
+  <div>Portraits and photos are from the 2002 and 2004 Shrapnel yearbooks.</div>
 </footer>
 
 <dialog id="dlg" aria-labelledby="pName"><div style="position:relative"><button class="x" id="dlgX" aria-label="Close">×</button><div class="card" id="card"></div></div></dialog>
@@ -297,22 +304,26 @@ function tile(p){
   const status = p.mem ? 'In memoriam' : FOUND[p.id] ? 'Found' : 'Not found yet';
   const img = p.portrait ? `<img src="${p.portrait}" alt="${esc(p.name)}, yearbook portrait" loading="lazy">` : `<div class="noimg">Photo not available in the book</div>`;
   return `<button class="tile${p.mem?' mem':''}" data-id="${p.id}">${img}
-    <div class="cap"><span class="rk">${p.rank ? p.rank+' · ' : ''}Class of ${p.cls}</span><span class="nm">${esc(p.name)}</span>
+    <div class="cap"><span class="rk">${p.rank ? p.rank+' · ' : ''}Class of ${p.cls}${(p.yrs||[]).length>1?' · <span class="ybadge">’02 + ’04</span>':''}</span><span class="nm">${esc(p.name)}</span>
     <span class="meta"><span>In ${n} photo${n===1?'':'s'}${((window.YB_NOTES||{})[p.id]||[]).length?' · '+(window.YB_NOTES[p.id].length)+' notes':''}</span><span class="dot${FOUND[p.id]&&!p.mem?' found':''}">${status}</span></span></div></button>`;
 }
 let filter='all';
 function renderWall(){
   const q = document.getElementById('q').value.trim().toLowerCase();
-  const cl = document.getElementById('cls').value;
-  const list = D.people.filter(p => (!cl || p.cls===cl) && (!q || p.name.toLowerCase().includes(q)) && (filter==='all' || (filter==='missing' && !p.mem && !FOUND[p.id]) || (filter==='found' && FOUND[p.id] && !p.mem) || (filter==='mem' && p.mem)));
-  document.getElementById('wall').innerHTML = list.length ? list.map(tile).join('') : `<p class="note">${filter==='found' ? 'No one has been found yet. Once a classmate claims their entry or a lead is confirmed, they show up here with a current photo next to their 2002 portrait.' : 'No one by that name.'}</p>`;
+  const cl = document.getElementById('cls').value, yb = document.getElementById('yb').value;
+  const inYb = p => !yb || (yb==='both' ? (p.yrs||[]).length>1 : (p.yrs||[]).some(y=>y.y===yb));
+  const list = D.people.filter(p => (!cl || p.cls===cl) && inYb(p) && (!q || p.name.toLowerCase().includes(q)) && (filter==='all' || (filter==='missing' && !p.mem && !FOUND[p.id]) || (filter==='found' && FOUND[p.id] && !p.mem) || (filter==='mem' && p.mem)));
+  document.getElementById('wall').innerHTML = list.length ? list.map(tile).join('') : `<p class="note">${filter==='found' ? 'No one has been found yet. Once a classmate claims their entry or a lead is confirmed, they show up here with a current photo next to their yearbook portrait.' : 'No one by that name.'}</p>`;
 }
 function renderFind(){ document.getElementById('findWall').innerHTML = D.people.filter(p=>!p.mem && !FOUND[p.id]).map(tile).join(''); }
 
 /* Book */
 let curPage = D.pages[0], showBoxes = true;
+const bookOf = pg => (D.books.find(b => b.pages.includes(pg)) || D.books[0]).y;
 function renderStrip(){
-  document.getElementById('strip').innerHTML = D.pages.map(pg => {
+  const cur = bookOf(curPage);
+  document.querySelectorAll('[data-book]').forEach(b => b.setAttribute('aria-pressed', b.dataset.book===cur));
+  document.getElementById('strip').innerHTML = D.books.find(b=>b.y===cur).pages.map(pg => {
     const n = D.faces.filter(f=>f.pg===pg && (f.s==='match'||f.s==='ref')).length;
     return `<button data-pg="${pg}" aria-current="${pg===curPage}" aria-label="Spread ${pg}"><img src="p/${pg}.jpg" alt="" loading="lazy">${n?`<small>${n}</small>`:''}</button>`;
   }).join('');
@@ -321,7 +332,7 @@ function renderSpread(flashKey){
   const fs = D.faces.filter(f => f.pg===curPage && f.s!=='none' && GTAG[fk(f)]!=='no' && !(f.s==='maybe' && tagState(fk(f))==='no'));
   const el = document.getElementById('spread');
   el.className = 'spread' + (showBoxes ? '' : ' hideboxes');
-  el.innerHTML = `<img src="p/${curPage}.jpg" alt="Yearbook spread ${curPage}">` + fs.map(f => {
+  el.innerHTML = `<img src="p/${curPage}.jpg" alt="${bookOf(curPage)} Shrapnel, spread ${curPage}">` + fs.map(f => {
     const p = byId[f.w], st = (f.s==='maybe' && tagState(fk(f))==='yes') ? 'match' : f.s;
     const lab = st==='maybe' ? `Is this ${p.name}?` : p.name;
     return `<button class="hot ${st}${fk(f)===flashKey?' flash':''}" style="left:${f.r[0]*100}%;top:${f.r[1]*100}%;width:${f.r[2]*100}%;height:${f.r[3]*100}%" data-id="${p.id}" data-k="${fk(f)}" aria-label="${esc(lab)}"><span class="lbl">${esc(lab)}</span></button>`;
@@ -336,8 +347,9 @@ const dlg = document.getElementById('dlg');
 function openCard(id){
   const p = byId[id], t = tagged(id), m = maybes(id), notes = (window.YB_NOTES||{})[id] || [];
   document.getElementById('card').innerHTML = `
-  <div class="left">${p.portrait ? `<img src="${p.portrait}" alt="${esc(p.name)}, yearbook portrait">` : '<div class="noimg">Photo not available in the book</div>'}
-    <div class="note">${p.cls==='2002'?'Senior portrait':'Class portrait'}, spread ${p.page}</div></div>
+  <div class="left">${p.portrait ? `<img id="mainPort" src="${p.portrait}" alt="${esc(p.name)}, yearbook portrait">` : '<div class="noimg">Photo not available in the book</div>'}
+    <div class="note" id="mainCap">${portCap(p, (p.yrs||[]).find(y=>y.img===p.portrait))}</div>
+    ${timelineHtml(p)}</div>
   <div class="right">
     <div><div class="rkl">${p.rank ? p.rank+' · ' : ''}Class of ${p.cls}</div><h2 id="pName">${esc(p.name)}</h2></div>
     <div class="cols">
@@ -364,6 +376,17 @@ function openCard(id){
   dlg.dataset.id = id;
   if (location.hash.slice(1) !== id) history.replaceState(null,'','#'+id);
   if (!dlg.open) dlg.showModal();
+}
+function portCap(p, y){
+  if (!y) return '';
+  return `${y.y} Shrapnel · ${y.cls === y.y ? 'senior portrait' : 'Class of '+y.cls+' portrait'} · spread ${y.page}`;
+}
+function timelineHtml(p){
+  const ys = p.yrs || [];
+  if (!ys.length) return '';
+  return `<div class="tl"><h3>In the yearbooks</h3>${ys.map(y => `<button class="tl-row${y.img===p.portrait?' on':''}" data-port="${y.img}" data-cap="${esc(portCap(p,y))}" ${y.img?'':'disabled'}>
+      ${y.img?`<img src="${y.img}" alt="">`:'<span class="ph0"></span>'}<span><b>${y.y} Shrapnel</b><small>${y.cls===y.y?'Senior':'Class of '+y.cls}${y.rank?' · '+esc(y.rank):''}</small><small>Spread ${y.page}</small></span></button>`).join('')}
+    ${ys.length>1?'<p class="note" style="margin:0">Tap a year to see that portrait.</p>':''}</div>`;
 }
 let composed = '';
 function nowHtml(id){
@@ -438,10 +461,15 @@ function openForm(id, kind){
   }
 }
 function bioHtml(p){
-  const b = p.bio;
-  if (!b) return `<p style="margin:0">${p.cls==='2002' ? 'Cadet '+esc(p.rank)+', Class of 2002.' : 'Class of '+p.cls+', in the 2001–02 corps.'}</p>${p.cls==='2002' ? '<p class="ph" style="margin:.4em 0 0">No senior bio in the book.</p>' : ''}`;
-  const rows = [['College plans',b.college],['Sports',b.sports],['Ranks',b.ranks],['Favorite memory',b.memory],['Quote',b.quote]].filter(r=>r[1]);
-  return `<dl>${rows.map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>${b.bioName?`<p class="note" style="margin:.5em 0 0">Bio printed as ${esc(b.bioName)}.</p>`:''}`;
+  const parts = [];
+  const dl = rows => `<dl>${rows.filter(r=>r[1]).map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>`;
+  if (p.bio04) { const b = p.bio04;
+    parts.push(`<p class="note" style="margin:0 0 4px">2004 Shrapnel senior bio</p>` + dl([['Rank',b.ranks],['Activities',b.sports],['Awards',b.awards],['Quote',b.quote]])); }
+  if (p.bio) { const b = p.bio;
+    parts.push(`${p.bio04?'<p class="note" style="margin:10px 0 4px">2002 Shrapnel senior bio</p>':''}` + dl([['College plans',b.college],['Sports',b.sports],['Ranks',b.ranks],['Favorite memory',b.memory],['Quote',b.quote]]) + (b.bioName?`<p class="note" style="margin:.5em 0 0">Bio printed as ${esc(b.bioName)}.</p>`:'')); }
+  if (parts.length) return parts.join('');
+  const ys = p.yrs || [];
+  return `<p style="margin:0">${ys.map(y => y.cls===y.y ? `Senior in the ${y.y} Shrapnel.` : `In the ${y.y} Shrapnel as Class of ${y.cls}.`).join(' ')}</p>`;
 }
 function openNote(id){
   const p = byId[id];
@@ -467,14 +495,14 @@ function openNote(id){
 function openRsvp(){
   delete dlg.dataset.id;
   document.getElementById('card').innerHTML = formShell(null, 'RSVP · Reunion May 2027', 'Count me in',
-    'In the 2002 book? Find yourself with the search box and use "This is me" on your card instead, so your RSVP is tied to your photo.',
+    'In the 2002 or 2004 yearbook? Find yourself with the search box and use "This is me" on your card instead, so your RSVP is tied to your photo.',
     inp('r_first','First name',{ac:'given-name',val:ea((ME.name||'').split(' ')[0])}) + inp('r_last','Last name',{ac:'family-name',val:ea((ME.name||'').split(' ').slice(1).join(' '))}) + inp('r_cls','Class year (the year you graduated or would have)',{val:ea(ME.cls)}) +
     inp('r_years','Years you attended NYMA (optional)') + sel('r_rsvp','Coming in May?',['Yes','Maybe']) + contactFields() +
     `<label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input id="r_pub" type="checkbox" checked style="width:auto"> Show my name and class year on the public list of expected attendees</label>`, 'Send RSVP');
   if (!dlg.open) dlg.showModal();
   const hint = document.createElement('div'); hint.id = 'r_hint'; document.getElementById('f').prepend(hint);
   const check = () => { const p = matchPerson(g('r_first')+' '+g('r_last'), g('r_cls'));
-    hint.innerHTML = p ? `<div class="maybe-row" style="border-style:solid">${p.portrait?`<img src="${p.portrait}" alt="">`:''}<div class="q"><b>You're in the 2002 Shrapnel.</b> Is this you: ${esc(p.name)}, Class of ${p.cls}?</div><div class="yn"><button class="btn pri" type="button" data-claim="${p.id}">Yes, use my card</button></div></div>` : ''; };
+    hint.innerHTML = p ? `<div class="maybe-row" style="border-style:solid">${p.portrait?`<img src="${p.portrait}" alt="">`:''}<div class="q"><b>You're in the Shrapnel.</b> Is this you: ${esc(p.name)}, Class of ${p.cls}?</div><div class="yn"><button class="btn pri" type="button" data-claim="${p.id}">Yes, use my card</button></div></div>` : ''; };
   ['r_first','r_last','r_cls'].forEach(i => document.getElementById(i).addEventListener('input', check));
   bindForm(out => {
     if (blank()) { out.innerHTML = '<p class="note">The form is empty.</p>'; return; }
@@ -615,6 +643,8 @@ document.addEventListener('click', e => {
   const hot = e.target.closest('.hot'); if (hot) return openCard(hot.dataset.id);
   const th = e.target.closest('.th'); if (th) { dlg.close(); return gotoFace(th.dataset.pg, th.dataset.k); }
   const sb = e.target.closest('#strip button'); if (sb) { curPage = sb.dataset.pg; return renderSpread(); }
+  const tr = e.target.closest('.tl-row'); if (tr && tr.dataset.port) { document.getElementById('mainPort').src = tr.dataset.port; document.getElementById('mainCap').textContent = tr.dataset.cap; document.querySelectorAll('.tl-row').forEach(r=>r.classList.toggle('on', r===tr)); return; }
+  const bkb = e.target.closest('[data-book]'); if (bkb) { const b = D.books.find(x=>x.y===bkb.dataset.book); curPage = b.start || b.pages[0]; return renderSpread(); }
   const y = e.target.closest('[data-yes]'), n = e.target.closest('[data-no]');
   if (y || n) { const k=(y||n).dataset.yes || (y||n).dataset.no; confirms[k] = y ? 'yes':'no'; store.set(confirms); const tp = byId[dlg.dataset.id]; submitEntry({type: y ? 'tag' : 'untag', id: dlg.dataset.id, name: tp ? tp.name : '', cls: tp ? tp.cls : '', det: k, msg: (y ? 'Confirmed photo on spread ' : 'Rejected photo on spread ') + k.split(':')[0], pub:'no'}).catch(()=>{}); stats(); renderWall(); renderFind(); if(!document.getElementById('v-book').hidden) renderSpread(); openCard(dlg.dataset.id); toast(y ? 'Thanks. Tag sent for approval.' : 'Thanks. Sent for review.'); return; }
   const see = e.target.closest('[data-see]'); if (see) { const [pg,k]=see.dataset.see.split('|'); dlg.close(); return gotoFace(pg,k); }
@@ -628,6 +658,7 @@ dlg.addEventListener('close', () => { if (byId[location.hash.slice(1)]) history.
 dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
 document.getElementById('q').addEventListener('input', renderWall);
 document.getElementById('cls').addEventListener('change', renderWall);
+document.getElementById('yb').addEventListener('change', renderWall);
 document.getElementById('boxToggle').onclick = e => { showBoxes = !showBoxes; e.currentTarget.setAttribute('aria-pressed', showBoxes); renderSpread(); };
 
 const jump = document.getElementById('jump'), jl = document.getElementById('jumpList');
@@ -639,7 +670,7 @@ function renderJump(){
   const parts = q.split(/\s+/);
   jres = D.people.filter(p => { const n = norm(p.name); return parts.every(w => n.split(' ').some(t => t.startsWith(w)) || n.includes(w)); }).slice(0,12);
   jsel = 0;
-  jl.innerHTML = jres.length ? jres.map((p,i)=>`<li role="option" data-id="${p.id}" aria-selected="${i===0}">${p.portrait?`<img src="${p.portrait}" alt="">`:'<span class="ph0"></span>'}<span>${esc(p.name)}</span><small>Class of ${p.cls}</small></li>`).join('') : '<li aria-disabled="true">No cadet by that name in the book</li>';
+  jl.innerHTML = jres.length ? jres.map((p,i)=>`<li role="option" data-id="${p.id}" aria-selected="${i===0}">${p.portrait?`<img src="${p.portrait}" alt="">`:'<span class="ph0"></span>'}<span>${esc(p.name)}</span><small>Class of ${p.cls}</small></li>`).join('') : '<li aria-disabled="true">No cadet by that name in the yearbooks</li>';
   jl.hidden = false; jump.setAttribute('aria-expanded','true');
 }
 function goTo(id){ jl.hidden = true; jump.value = ''; location.hash = id; }
