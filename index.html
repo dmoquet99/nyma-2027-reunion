@@ -456,6 +456,10 @@ function openRsvp(){
     inp('r_years','Years you attended NYMA (optional)') + sel('r_rsvp','Coming in May?',['Yes','Maybe']) + contactFields() +
     `<label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input id="r_pub" type="checkbox" checked style="width:auto"> Show my name and class year on the public list of expected attendees</label>`, 'Send RSVP');
   if (!dlg.open) dlg.showModal();
+  const hint = document.createElement('div'); hint.id = 'r_hint'; document.getElementById('f').prepend(hint);
+  const check = () => { const p = matchPerson(g('r_first')+' '+g('r_last'), g('r_cls'));
+    hint.innerHTML = p ? `<div class="maybe-row" style="border-style:solid">${p.portrait?`<img src="${p.portrait}" alt="">`:''}<div class="q"><b>You're in the 2002 Shrapnel.</b> Is this you: ${esc(p.name)}, Class of ${p.cls}?</div><div class="yn"><button class="btn pri" type="button" data-claim="${p.id}">Yes, use my card</button></div></div>` : ''; };
+  ['r_first','r_last','r_cls'].forEach(i => document.getElementById(i).addEventListener('input', check));
   bindForm(out => {
     if (!g('r_first') || !g('r_last') || !g('r_cls')) { out.innerHTML = '<p class="note">First name, last name and class year are required.</p>'; return; }
     if (!emailOk(g('c_email'))) { out.innerHTML = '<p class="note">Add a valid email so we can send you reunion updates.</p>'; return; }
@@ -477,6 +481,21 @@ function openOptout(id){
     send({type:'removal', id: p?p.id:'', name: p?p.name:g('o_name'), cls: p?p.cls:g('o_cls'), msg:g('o_note'), email:g('c_email'), phone:g('c_phone'), pub:'no'},
       'The organizer will take it down and confirm by email.');
   });
+}
+
+/* Match a typed name (and class year) to a cadet in the book */
+function nameParts(s){ const t = norm(s||'').split(/\s+/).filter(Boolean).filter(w=>!/^(jr|sr|ii|iii|iv)$/.test(w)); return t.length ? {first:t[0], last:t[t.length-1]} : null; }
+const NICK = {mike:'michael',mikey:'michael',bill:'william',will:'william',billy:'william',bob:'robert',rob:'robert',bobby:'robert',jim:'james',jimmy:'james',dan:'daniel',danny:'daniel',tony:'anthony',alex:'alexander',matt:'matthew',nick:'nicholas',ben:'benjamin',steve:'stephen',greg:'gregory',joe:'joseph',joey:'joseph',josh:'joshua',sam:'samuel',kate:'kathleen',katie:'kathleen',dave:'david',rick:'richard',rich:'richard',tom:'thomas',tommy:'thomas',jon:'jonathan',chris:'christopher',liz:'elizabeth',beth:'elizabeth',vic:'victoria',vicky:'victoria',doug:'douglas',ed:'edward',eddie:'edward',gene:'eugene',zack:'zachary',zach:'zachary',andy:'andrew',drew:'andrew',jake:'jacob',pete:'peter',ron:'ronald',ray:'raymond',fred:'frederick',vince:'vincent',phil:'philip',ken:'kenneth',kenny:'kenneth',larry:'lawrence',marc:'marcos',jorge:'jose'};
+const canon = n => NICK[n] || n;
+const firstOk = (a,b) => { a = canon(a); b = canon(b); return a===b || (a.length>=3 && b.length>=3 && (a.startsWith(b) || b.startsWith(a))) || (a[0]===b[0] && (a.startsWith('christ') && b.startsWith('christ'))); };
+function matchPerson(name, cls){
+  const q = nameParts(name); if (!q) return null;
+  let c = String(cls||'').replace(/\D/g,''); if (c.length===2) c = '20'+c; c = c.slice(-4);
+  let hits = D.people.filter(p => { const n = nameParts(p.name); return n && n.last===q.last && firstOk(n.first,q.first); });
+  if (hits.length > 1 && c) hits = hits.filter(p => p.cls===c);
+  if (hits.length !== 1) return null;
+  if (c && hits[0].cls !== c && canon(nameParts(hits[0].name).first)!==canon(q.first)) return null;
+  return hits[0];
 }
 
 /* Approved submissions from the organizer's sheet */
@@ -504,8 +523,11 @@ async function loadApproved(){
     else if (t==='claim' && byId[id]) { FOUND[id] = 1; const d = kv(det); NOW[id] = {...d, msg};
       if ((d.Coming||'').toLowerCase()!=='no') att.push({id, name:byId[id].name, cls:byId[id].cls, note:(d.Coming||'').toLowerCase()==='maybe'?'maybe':''}); }
     else if (t==='lead' && byId[id]) FOUND[id] = FOUND[id] || 'lead';
-    else if (t==='rsvp' && (pub||'').toLowerCase()==='yes' && name) { const d = kv(det); att.push({name, cls, note:(d.Coming||'').toLowerCase()==='maybe'?'maybe':''}); }
+    else if (t==='rsvp' && name) { const d = kv(det), p = matchPerson(name, cls), note = (d.Coming||'').toLowerCase()==='maybe'?'maybe':'';
+      if (p) { FOUND[p.id] = 1; att.push({id:p.id, name:p.name, cls:p.cls, note}); }
+      else if ((pub||'').toLowerCase()==='yes') att.push({name, cls, note}); }
   }
+  const seen = new Set(); window.YB_ATTENDEES = att.filter(a => { const k = a.id || ('n:'+norm(a.name)+a.cls); if (seen.has(k)) return false; seen.add(k); return true; });
   if (Object.keys(removed).length){
     D.people = D.people.filter(p => !removed[p.id]); D.faces = D.faces.filter(f => !removed[f.w]);
     Object.keys(removed).forEach(k => delete byId[k]);
@@ -529,6 +551,7 @@ function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg
 document.addEventListener('click', e => {
   const tl = e.target.closest('.tile, .tile-lite'); if (tl) return openCard(tl.dataset.id);
   const rv = e.target.closest('[data-rsvp]'); if (rv) return openRsvp();
+  const cl = e.target.closest('[data-claim]'); if (cl) { dlg.dataset.id = cl.dataset.claim; return openForm(cl.dataset.claim, 'me'); }
   const oo = e.target.closest('[data-optout]'); if (oo) return openOptout(oo.dataset.optout);
   const fc = e.target.closest('[data-focus]'); if (fc) { const j = document.getElementById(fc.dataset.focus); j.scrollIntoView({block:'center'}); return j.focus(); }
   const hot = e.target.closest('.hot'); if (hot) return openCard(hot.dataset.id);
