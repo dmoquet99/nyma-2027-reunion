@@ -290,10 +290,11 @@ const GTAG = {};  // approved by organizer: faceKey -> 'yes' | 'no'
 const tagState = k => GTAG[k] || confirms[k];
 function tagged(id){ return D.faces.filter(f => f.w===id && tagState(fk(f))!=='no' && (f.s==='match' || (f.s==='maybe' && tagState(fk(f))==='yes'))); }
 function maybes(id){ return D.faces.filter(f => f.w===id && f.s==='maybe' && !tagState(fk(f))); }
+const clsL = p => p.staff ? 'NYMA Staff · '+p.staff : 'Class of '+p.cls;
 function esc(s){ return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 function stats(){
-  document.getElementById('sPeople').textContent = D.people.length;
+  document.getElementById('sPeople').textContent = D.people.filter(p=>!p.staff).length;
   document.getElementById('sTotal').textContent = D.people.filter(p=>!p.mem).length;
   document.getElementById('sFound').textContent = D.people.filter(p=>!p.mem && FOUND[p.id]).length;
   
@@ -304,7 +305,7 @@ function tile(p){
   const status = p.mem ? 'In memoriam' : FOUND[p.id] ? 'Found' : 'Not found yet';
   const img = p.portrait ? `<img src="${p.portrait}" alt="${esc(p.name)}, yearbook portrait" loading="lazy">` : `<div class="noimg">Photo not available in the book</div>`;
   return `<button class="tile${p.mem?' mem':''}" data-id="${p.id}">${img}
-    <div class="cap"><span class="rk">${p.rank ? p.rank+' · ' : ''}Class of ${p.cls}${(p.yrs||[]).length>1?' · <span class="ybadge">’02 + ’04</span>':''}</span><span class="nm">${esc(p.name)}</span>
+    <div class="cap"><span class="rk">${p.rank ? p.rank+' · ' : ''}${clsL(p)}${(p.yrs||[]).length>1?' · <span class="ybadge">’02 + ’04</span>':''}</span><span class="nm">${esc(p.name)}</span>
     <span class="meta"><span>In ${n} photo${n===1?'':'s'}${((window.YB_NOTES||{})[p.id]||[]).length?' · '+(window.YB_NOTES[p.id].length)+' notes':''}</span><span class="dot${FOUND[p.id]&&!p.mem?' found':''}">${status}</span></span></div></button>`;
 }
 let filter='all';
@@ -351,7 +352,7 @@ function openCard(id){
     <div class="note" id="mainCap">${portCap(p, (p.yrs||[]).find(y=>y.img===p.portrait))}</div>
     ${timelineHtml(p)}</div>
   <div class="right">
-    <div><div class="rkl">${p.rank ? p.rank+' · ' : ''}Class of ${p.cls}</div><h2 id="pName">${esc(p.name)}</h2></div>
+    <div><div class="rkl">${p.rank ? p.rank+' · ' : ''}${clsL(p)}</div><h2 id="pName">${esc(p.name)}</h2></div>
     <div class="cols">
       <div class="bio"><h3>Then</h3>${bioHtml(p)}</div>
       ${p.mem ? `<div><h3>In Memoriam</h3><p class="memline">${esc(p.mem.years)}</p>${p.mem.src?`<p class="note">Obituary: ${esc(p.mem.src)}</p>`:''}
@@ -379,13 +380,13 @@ function openCard(id){
 }
 function portCap(p, y){
   if (!y) return '';
-  return `${y.y} Shrapnel · ${y.cls === y.y ? 'senior portrait' : 'Class of '+y.cls+' portrait'} · spread ${y.page}`;
+  return `${y.y} Shrapnel · ${y.cls==='staff' ? 'staff portrait' : y.cls === y.y ? 'senior portrait' : 'Class of '+y.cls+' portrait'} · spread ${y.page}`;
 }
 function timelineHtml(p){
   const ys = p.yrs || [];
   if (!ys.length) return '';
   return `<div class="tl"><h3>In the yearbooks</h3>${ys.map(y => `<button class="tl-row${y.img===p.portrait?' on':''}" data-port="${y.img}" data-cap="${esc(portCap(p,y))}" ${y.img?'':'disabled'}>
-      ${y.img?`<img src="${y.img}" alt="">`:'<span class="ph0"></span>'}<span><b>${y.y} Shrapnel</b><small>${y.cls===y.y?'Senior':'Class of '+y.cls}${y.rank?' · '+esc(y.rank):''}</small><small>Spread ${y.page}</small></span></button>`).join('')}
+      ${y.img?`<img src="${y.img}" alt="">`:'<span class="ph0"></span>'}<span><b>${y.y} Shrapnel</b><small>${y.cls==='staff'?'Staff':y.cls===y.y?'Senior':'Class of '+y.cls}${y.rank?' · '+esc(y.rank):''}</small><small>Spread ${y.page}</small></span></button>`).join('')}
     ${ys.length>1?'<p class="note" style="margin:0">Tap a year to see that portrait.</p>':''}</div>`;
 }
 let composed = '';
@@ -407,7 +408,7 @@ async function submitEntry(v){
 }
 const emailOk = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 function formShell(p, kicker, title, intro, fieldsHtml, btn){
-  const left = p ? `<div class="left">${p.portrait?`<img src="${p.portrait}" alt="">`:''}<div class="note">${esc(p.name)}, Class of ${p.cls}</div></div>`
+  const left = p ? `<div class="left">${p.portrait?`<img src="${p.portrait}" alt="">`:''}<div class="note">${esc(p.name)}, ${clsL(p)}</div></div>`
                  : `<div class="left"><div class="noimg" style="aspect-ratio:auto;padding:24px 10px">All NYMA cadets welcome, any class, any length of stay.</div></div>`;
   return `${left}<div class="right"><div><div class="rkl">${kicker}</div><h2 id="pName">${esc(title)}</h2></div>
     ${intro?`<p class="note" style="margin:0">${intro}</p>`:''}
@@ -469,6 +470,7 @@ function bioHtml(p){
     parts.push(`${p.bio04?'<p class="note" style="margin:10px 0 4px">2002 Shrapnel senior bio</p>':''}` + dl([['College plans',b.college],['Sports',b.sports],['Ranks',b.ranks],['Favorite memory',b.memory],['Quote',b.quote]]) + (b.bioName?`<p class="note" style="margin:.5em 0 0">Bio printed as ${esc(b.bioName)}.</p>`:'')); }
   if (parts.length) return parts.join('');
   const ys = p.yrs || [];
+  if (p.staff) return `<p style="margin:0">NYMA ${esc(p.staff)}, pictured in the ${ys.map(y=>y.y).join(' and ')} Shrapnel.</p>`;
   return `<p style="margin:0">${ys.map(y => y.cls===y.y ? `Senior in the ${y.y} Shrapnel.` : `In the ${y.y} Shrapnel as Class of ${y.cls}.`).join(' ')}</p>`;
 }
 function openNote(id){
@@ -562,7 +564,7 @@ function matchPerson(name, cls){
   let c = String(cls||'').replace(/\D/g,''); if (c.length===2) c = '20'+c; c = c.slice(-4);
   const qf = q[0], ql = q[q.length-1], qlJoined = q.slice(1).join('');
   const scored = [];
-  for (const p of D.people){
+  for (const p of D.people){ if (p.staff) continue;
     const t = lastOf(p.name); if (t.length < 2) continue;
     const pf = t[0], pl = t[t.length-1], plJoined = t.slice(1).join('');
     const ls = Math.max(lastScore(ql,pl), lastScore(qlJoined,plJoined), lastScore(ql,plJoined), ...t.slice(1).map(x => x.length>=4 ? Math.min(lastScore(ql,x),3) : 0));
@@ -670,7 +672,7 @@ function renderJump(){
   const parts = q.split(/\s+/);
   jres = D.people.filter(p => { const n = norm(p.name); return parts.every(w => n.split(' ').some(t => t.startsWith(w)) || n.includes(w)); }).slice(0,12);
   jsel = 0;
-  jl.innerHTML = jres.length ? jres.map((p,i)=>`<li role="option" data-id="${p.id}" aria-selected="${i===0}">${p.portrait?`<img src="${p.portrait}" alt="">`:'<span class="ph0"></span>'}<span>${esc(p.name)}</span><small>Class of ${p.cls}</small></li>`).join('') : '<li aria-disabled="true">No cadet by that name in the yearbooks</li>';
+  jl.innerHTML = jres.length ? jres.map((p,i)=>`<li role="option" data-id="${p.id}" aria-selected="${i===0}">${p.portrait?`<img src="${p.portrait}" alt="">`:'<span class="ph0"></span>'}<span>${esc(p.name)}</span><small>${clsL(p)}</small></li>`).join('') : '<li aria-disabled="true">No cadet by that name in the yearbooks</li>';
   jl.hidden = false; jump.setAttribute('aria-expanded','true');
 }
 function goTo(id){ jl.hidden = true; jump.value = ''; location.hash = id; }
