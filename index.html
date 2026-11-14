@@ -162,6 +162,8 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
 .optout{font-size:13px;color:var(--muted);margin:0}
 @media (max-width:760px){.splash-grid{grid-template-columns:1fr}}
 .hero h1.sub{font-size:clamp(28px,3.6vw,42px);line-height:1}
+.notme{position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(10,16,30,.85);color:var(--ink);font-size:15px;line-height:1;padding:0;cursor:pointer}
+.notme:hover{background:#b33;color:#fff}
 .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--brass);color:var(--navy);padding:8px 14px;border-radius:3px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
 .toast.on{opacity:1}
 
@@ -277,8 +279,10 @@ const fk = f => f.pg + ':' + f.r.join(',');
 const surname = n => { const s=n.split(' '); return (s.length>2 && s[s.length-2]==='St.') ? 'St. '+s[s.length-1] : s[s.length-1]; };
 D.people.sort((a,b) => surname(a.name).localeCompare(surname(b.name)));
 
-function tagged(id){ return D.faces.filter(f => f.w===id && (f.s==='match' || (f.s==='maybe' && confirms[fk(f)]==='yes'))); }
-function maybes(id){ return D.faces.filter(f => f.w===id && f.s==='maybe' && !confirms[fk(f)]); }
+const GTAG = {};  // approved by organizer: faceKey -> 'yes' | 'no'
+const tagState = k => GTAG[k] || confirms[k];
+function tagged(id){ return D.faces.filter(f => f.w===id && tagState(fk(f))!=='no' && (f.s==='match' || (f.s==='maybe' && tagState(fk(f))==='yes'))); }
+function maybes(id){ return D.faces.filter(f => f.w===id && f.s==='maybe' && !tagState(fk(f))); }
 function esc(s){ return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 function stats(){
@@ -314,11 +318,11 @@ function renderStrip(){
   }).join('');
 }
 function renderSpread(flashKey){
-  const fs = D.faces.filter(f => f.pg===curPage && f.s!=='none' && !(f.s==='maybe' && confirms[fk(f)]==='no'));
+  const fs = D.faces.filter(f => f.pg===curPage && f.s!=='none' && GTAG[fk(f)]!=='no' && !(f.s==='maybe' && tagState(fk(f))==='no'));
   const el = document.getElementById('spread');
   el.className = 'spread' + (showBoxes ? '' : ' hideboxes');
   el.innerHTML = `<img src="p/${curPage}.jpg" alt="Yearbook spread ${curPage}">` + fs.map(f => {
-    const p = byId[f.w], st = (f.s==='maybe' && confirms[fk(f)]==='yes') ? 'match' : f.s;
+    const p = byId[f.w], st = (f.s==='maybe' && tagState(fk(f))==='yes') ? 'match' : f.s;
     const lab = st==='maybe' ? `Is this ${p.name}?` : p.name;
     return `<button class="hot ${st}${fk(f)===flashKey?' flash':''}" style="left:${f.r[0]*100}%;top:${f.r[1]*100}%;width:${f.r[2]*100}%;height:${f.r[3]*100}%" data-id="${p.id}" data-k="${fk(f)}" aria-label="${esc(lab)}"><span class="lbl">${esc(lab)}</span></button>`;
   }).join('');
@@ -348,7 +352,7 @@ function openCard(id){
       <div class="actions" style="margin-top:8px"><button class="btn" data-act="note">Leave a note for ${esc(p.name.split(' ')[0])}</button></div>
     </div>
     <div class="sec"><h3>Appears in <b>${t.length}</b> photo${t.length===1?'':'s'}</h3>
-      ${t.length ? `<div class="thumbs">${t.map(f=>`<button class="th" data-pg="${f.pg}" data-k="${fk(f)}" aria-label="Open spread ${f.pg}"><img src="${f.t}" alt=""><small>p. ${f.pg}</small></button>`).join('')}</div>` : '<p class="ph">No confident matches.</p>'}
+      ${t.length ? `<div class="thumbs">${t.map(f=>`<div style="position:relative"><button class="th" data-pg="${f.pg}" data-k="${fk(f)}" aria-label="Open spread ${f.pg}" style="width:100%"><img src="${f.t}" alt=""><small>p. ${f.pg}</small></button><button class="notme" data-no="${fk(f)}" title="Not ${esc(p.name.split(' ')[0])}" aria-label="Not ${esc(p.name)}">×</button></div>`).join('')}</div><p class="note" style="margin:6px 0 0">Wrong person in a photo? Tap the × on it.</p>` : '<p class="ph">No confident matches.</p>'}
     </div>
     ${m.length ? `<div class="sec"><h3>Help confirm · <b>${m.length}</b> possible</h3><div style="display:grid;gap:8px">
       ${m.map(f=>`<div class="maybe-row" data-k="${fk(f)}"><img src="${f.t}" alt=""><div class="q">Is this ${esc(p.name.split(' ')[0])}? <span class="note">Spread ${f.pg} · similarity ${f.sim.toFixed(2)}</span></div>
@@ -551,7 +555,8 @@ async function loadApproved(){
   const notes = window.YB_NOTES = window.YB_NOTES || {}, att = window.YB_ATTENDEES = window.YB_ATTENDEES || [], removed = {};
   for (const [ts,type,id,name,cls,msg,det,pub] of rows){
     const t = (type||'').trim().toLowerCase(), n = parseFloat(ts), date = (!isNaN(n) && n > 40000) ? new Date(Math.round((n-25569)*86400000)).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'}) : (ts||'').split(' ')[0];
-    if (t==='removal' && id) removed[id] = 1;
+    if ((t==='tag' || t==='untag') && det) GTAG[det.trim()] = t==='tag' ? 'yes' : 'no';
+    else if (t==='removal' && id) removed[id] = 1;
     else if (t==='note' && byId[id] && msg) (notes[id] = notes[id] || []).push({from:name, cls, text:msg, date});
     else if (t==='claim' && byId[id]) { FOUND[id] = 1; const d = kv(det); NOW[id] = {...d, msg};
       if ((d.Coming||'').toLowerCase()!=='no') att.push({id, name:byId[id].name, cls:byId[id].cls, note:(d.Coming||'').toLowerCase()==='maybe'?'maybe':''}); }
@@ -591,7 +596,7 @@ document.addEventListener('click', e => {
   const th = e.target.closest('.th'); if (th) { dlg.close(); return gotoFace(th.dataset.pg, th.dataset.k); }
   const sb = e.target.closest('#strip button'); if (sb) { curPage = sb.dataset.pg; return renderSpread(); }
   const y = e.target.closest('[data-yes]'), n = e.target.closest('[data-no]');
-  if (y || n) { const k=(y||n).dataset.yes || (y||n).dataset.no; confirms[k] = y ? 'yes':'no'; store.set(confirms); stats(); renderWall(); renderFind(); if(!document.getElementById('v-book').hidden) renderSpread(); openCard(dlg.dataset.id); toast(y ? 'Tagged. Thanks.' : 'Removed.'); return; }
+  if (y || n) { const k=(y||n).dataset.yes || (y||n).dataset.no; confirms[k] = y ? 'yes':'no'; store.set(confirms); const tp = byId[dlg.dataset.id]; submitEntry({type: y ? 'tag' : 'untag', id: dlg.dataset.id, name: tp ? tp.name : '', cls: tp ? tp.cls : '', det: k, msg: (y ? 'Confirmed photo on spread ' : 'Rejected photo on spread ') + k.split(':')[0], pub:'no'}).catch(()=>{}); stats(); renderWall(); renderFind(); if(!document.getElementById('v-book').hidden) renderSpread(); openCard(dlg.dataset.id); toast(y ? 'Thanks. Tag sent for approval.' : 'Thanks. Sent for review.'); return; }
   const see = e.target.closest('[data-see]'); if (see) { const [pg,k]=see.dataset.see.split('|'); dlg.close(); return gotoFace(pg,k); }
   const act = e.target.closest('[data-act]'); if (act) return openForm(dlg.dataset.id, act.dataset.act);
   const cp = e.target.closest('[data-copy]'); if (cp) { const txt = cp.dataset.copy==='addr' ? ORGANIZER_EMAIL : composed; navigator.clipboard.writeText(txt).then(()=>toast('Copied'), ()=>toast('Select the text and copy it manually')); return; }
