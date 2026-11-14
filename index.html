@@ -363,7 +363,7 @@ function nowHtml(id){
 }
 const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScxMJjYfBTFSDXo49xTlJYrUJmMVvdPy5AO_PXXGZAQlUGXtA/formResponse';
 const FE = {type:'entry.418789659', id:'entry.586086303', name:'entry.631628868', cls:'entry.1511427373', msg:'entry.2071929603', det:'entry.399938544', email:'entry.1558039808', phone:'entry.1375405192', pub:'entry.1002765891'};
-const APPROVED_CSV = ''; // published "Sheet1" CSV link: approved rows only, no email/phone
+const APPROVED_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQI-8KL8ySd-1J-GlscMC2gxW52jLp83T8Fgmbb_hG6PMm1tGFJffSIqWbNTfCUtQ4O4j7KsyOuvEP6/pub?gid=1746630289&single=true&output=csv'; // published "Sheet1" CSV link: approved rows only, no email/phone
 async function submitEntry(v){
   const body = new URLSearchParams();
   Object.entries(v).forEach(([k,val]) => { if (FE[k] && val) body.append(FE[k], val); });
