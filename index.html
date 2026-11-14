@@ -342,8 +342,8 @@ function openCard(id){
     <div><div class="rkl">${p.rank ? p.rank+' · ' : ''}Class of ${p.cls}</div><h2 id="pName">${esc(p.name)}</h2></div>
     <div class="cols">
       <div class="bio"><h3>Then</h3>${bioHtml(p)}</div>
-      ${p.mem ? `<div><h3>In Memoriam</h3><p class="memline">${esc(p.mem.years)}</p><p class="note">Obituary: ${esc(p.mem.src)}</p>
-        <div class="actions"><a class="btn pri" href="${p.mem.obit}" target="_blank" rel="noopener">Read obituary</a></div></div>`
+      ${p.mem ? `<div><h3>In Memoriam</h3><p class="memline">${esc(p.mem.years)}</p>${p.mem.src?`<p class="note">Obituary: ${esc(p.mem.src)}</p>`:''}
+        ${/^https?:\/\//.test(p.mem.obit||'')?`<div class="actions"><a class="btn pri" href="${esc(p.mem.obit)}" target="_blank" rel="noopener">Read obituary</a></div>`:''}</div>`
       : `<div><h3>Now</h3>${nowHtml(id)}
         <div class="actions"><button class="btn pri" data-act="me">This is me · I’m coming in May</button><button class="btn" data-act="lead">I know where they are</button></div></div>`}
     </div>
@@ -358,6 +358,7 @@ function openCard(id){
       ${m.map(f=>`<div class="maybe-row" data-k="${fk(f)}"><img src="${f.t}" alt=""><div class="q">Is this ${esc(p.name.split(' ')[0])}? <span class="note">Spread ${f.pg} · similarity ${f.sim.toFixed(2)}</span></div>
         <div class="yn"><button class="btn pri" data-yes="${fk(f)}">Yes</button><button class="btn" data-no="${fk(f)}">No</button><button class="btn" data-see="${f.pg}|${fk(f)}">See</button></div></div>`).join('')}
     </div></div>` : ''}
+    ${p.mem ? '' : `<p class="optout">Know that ${esc(p.name.split(' ')[0])} has passed away? <button class="btn" data-memorial="${p.id}">Let us know</button></p>`}
     <p class="optout">Is this you and you'd rather not be listed? <button class="btn" data-optout="${p.id}">Ask to be removed</button></p>
   </div>`;
   dlg.dataset.id = id;
@@ -482,6 +483,20 @@ function openRsvp(){
       pub ? 'Your name goes on the Who\'s Coming list once the organizer confirms it.' : 'The organizer has your RSVP.');
   });
 }
+function openMemorial(id){
+  const p = byId[id];
+  document.getElementById('card').innerHTML = formShell(p, 'In memoriam', p.name,
+    'This goes only to the organizer. Once confirmed, the card is marked In Memoriam and the wall becomes a place for memories.',
+    inp('m_years','Years (for example 1985 – 2010), or year of passing') + inp('m_obit','Link to an obituary, if you have one') +
+    inp('m_more','Anything else the organizer should know (optional)',{ta:1}) +
+    inp('m_from','Your name',{val:ea(ME.name)}) + inp('m_fcls','Your class year',{val:ea(ME.cls)}) + contactFields(), 'Send');
+  bindForm(out => {
+    if (blank()) { out.innerHTML = '<p class="note">The form is empty.</p>'; return; }
+    const det = [['Years',g('m_years')],['Obituary',g('m_obit')]].filter(x=>x[1]).map(x=>x.join(': ')).join('\n');
+    send({type:'memorial', id:p.id, name:g('m_from'), cls:g('m_fcls'), msg:g('m_more'), det, email:g('c_email'), phone:g('c_phone'), pub:'no'},
+      'Thank you. The organizer will confirm it before anything changes on the site.');
+  });
+}
 function openOptout(id){
   const p = id ? byId[id] : null;
   if (!p) delete dlg.dataset.id;
@@ -558,6 +573,9 @@ async function loadApproved(){
     const t = (type||'').trim().toLowerCase(), n = parseFloat(ts), date = (!isNaN(n) && n > 40000) ? new Date(Math.round((n-25569)*86400000)).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'}) : (ts||'').split(' ')[0];
     if ((t==='tag' || t==='untag') && det) GTAG[det.trim()] = t==='tag' ? 'yes' : 'no';
     else if (t==='removal' && id) removed[id] = 1;
+    else if (t==='memorial' && byId[id]) { const d = kv(det), url = (d.Obituary||'').trim();
+      let src = ''; try { src = url ? new URL(url).hostname.replace(/^www\./,'') : ''; } catch(e){}
+      byId[id].mem = {years: d.Years || 'In memoriam', obit: url, src}; }
     else if (t==='note' && byId[id] && msg) (notes[id] = notes[id] || []).push({from:name, cls, text:msg, date});
     else if (t==='claim' && byId[id]) { FOUND[id] = 1; const d = kv(det); NOW[id] = {...d, msg};
       if ((d.Coming||'').toLowerCase()!=='no') att.push({id, name:byId[id].name, cls:byId[id].cls, note:(d.Coming||'').toLowerCase()==='maybe'?'maybe':''}); }
@@ -592,6 +610,7 @@ document.addEventListener('click', e => {
   const rv = e.target.closest('[data-rsvp]'); if (rv) return openRsvp();
   const cl = e.target.closest('[data-claim]'); if (cl) { dlg.dataset.id = cl.dataset.claim; return openForm(cl.dataset.claim, 'me'); }
   const oo = e.target.closest('[data-optout]'); if (oo) return openOptout(oo.dataset.optout);
+  const mm = e.target.closest('[data-memorial]'); if (mm) return openMemorial(mm.dataset.memorial);
   const fc = e.target.closest('[data-focus]'); if (fc) { const j = document.getElementById(fc.dataset.focus); j.scrollIntoView({block:'center'}); return j.focus(); }
   const hot = e.target.closest('.hot'); if (hot) return openCard(hot.dataset.id);
   const th = e.target.closest('.th'); if (th) { dlg.close(); return gotoFace(th.dataset.pg, th.dataset.k); }
