@@ -393,7 +393,10 @@ function formShell(p, kicker, title, intro, fieldsHtml, btn){
 }
 const inp = (id,label,opt={}) => `<label for="${id}">${label}${opt.ta?`<textarea id="${id}"></textarea>`:`<input id="${id}" type="${opt.type||'text'}"${opt.val?` value="${opt.val}"`:''}${opt.ac?` autocomplete="${opt.ac}"`:''}>`}</label>`;
 const sel = (id,label,opts) => `<label for="${id}">${label}<select id="${id}" style="background:#0d1528;border:1px solid #33405e;color:var(--ink);padding:9px 10px;font:inherit;border-radius:3px">${opts.map(o=>`<option>${o}</option>`).join('')}</select></label>`;
-const contactFields = () => inp('c_email','Email (optional, for reunion updates; never posted)',{type:'email',ac:'email'}) + inp('c_phone','Phone (optional, organizer only)',{type:'tel',ac:'tel'});
+const ME = (() => { try { return JSON.parse(localStorage.getItem('yb-me')||'{}'); } catch(e){ return {}; } })();
+function remember(v){ Object.entries(v).forEach(([k,x]) => { if (x) ME[k]=x; }); try { localStorage.setItem('yb-me', JSON.stringify(ME)); } catch(e){} }
+const ea = s => String(s||'').replace(/"/g,'&quot;');
+const contactFields = () => inp('c_email','Email (optional, for reunion updates; never posted)',{type:'email',ac:'email',val:ea(ME.email)}) + inp('c_phone','Phone (optional, organizer only)',{type:'tel',ac:'tel',val:ea(ME.phone)});
 const g = i => (document.getElementById(i)?.value || '').trim();
 const blank = () => ![...document.querySelectorAll('#f input:not([type=checkbox]), #f textarea')].some(e => e.value.trim());
 function done(msg){
@@ -404,7 +407,7 @@ function done(msg){
 async function send(v, msg){
   const out = document.getElementById('out'), b = document.getElementById('f_btn');
   b.disabled = true; b.textContent = 'Sending…';
-  try { await submitEntry(v); done(msg); }
+  try { await submitEntry(v); remember({email:v.email, phone:v.phone, verified:1, ...(v.type!=='lead' && v.type!=='removal' ? {name:v.name, cls:v.cls} : {})}); done(msg); }
   catch(e){ b.disabled = false; b.textContent = 'Try again'; out.innerHTML = `<p class="note">That didn't go through. Check your connection and try again, or email ${esc(ORGANIZER_EMAIL)}.</p>`; }
 }
 function bindForm(handler){
@@ -425,10 +428,10 @@ function openForm(id, kind){
   } else {
     document.getElementById('card').innerHTML = formShell(p, 'Send a lead', p.name, 'Leads go only to the organizer. Nothing you write here is posted.',
       inp('l_where','Where they are now (city, work, anything you know)',{ta:1}) + inp('l_link','A link to them, if you have one') +
-      inp('l_you','Your name') + inp('l_cls','Your class year') + contactFields(), 'Send lead');
+      inp('l_you','Your name',{val:ea(ME.name)}) + inp('l_cls','Your class year',{val:ea(ME.cls)}) + contactFields(), 'Send lead');
     bindForm(out => {
       if (blank()) { out.innerHTML = '<p class="note">The form is empty.</p>'; return; }
-      send({type:'lead', id:p.id, name:g('l_you'), cls:g('l_cls'), msg:g('l_where'), det:g('l_link'), email:g('c_email'), phone:g('c_phone'), pub:'no'},
+      remember({name:g('l_you'), cls:g('l_cls')}); send({type:'lead', id:p.id, name:g('l_you'), cls:g('l_cls'), msg:g('l_where'), det:g('l_link'), email:g('c_email'), phone:g('c_phone'), pub:'no'},
         'The organizer will follow up on it.');
     });
   }
@@ -443,12 +446,14 @@ function openNote(id){
   const p = byId[id];
   document.getElementById('card').innerHTML = formShell(p, 'Leave a note', p.name, 'Notes appear on this wall once the organizer approves them. Everyone can read them.',
     inp('n_q','NYMA check: who was the Senior LET Instructor?') +
-    `<div id="n_rest" hidden style="display:grid;gap:10px">${inp('n_from','Your name',{ac:'name'})}${inp('n_cls','Your class year')}${inp('n_text','Your note'+(p.mem?' or memory':''),{ta:1})}${contactFields()}</div>`, 'Check');
+    `<div id="n_rest" hidden style="display:grid;gap:10px">${inp('n_from','Your name',{ac:'name',val:ea(ME.name)})}${inp('n_cls','Your class year',{val:ea(ME.cls)})}${inp('n_text','Your note'+(p.mem?' or memory':''),{ta:1})}${contactFields()}</div>`, 'Check');
   let ok = false;
+  const unlock = () => { ok = true; document.getElementById('n_rest').hidden = false; document.getElementById('n_q').closest('label').hidden = true; document.getElementById('f_btn').textContent = 'Post note'; };
+  if (ME.verified) unlock();
   bindForm(out => {
     if (!ok) {
       const a = g('n_q').toLowerCase().replace(/[^a-z]/g,'');
-      if (/^(col|colonel|ltc|)brand$/.test(a)) { ok = true; document.getElementById('n_rest').hidden = false; document.getElementById('n_q').disabled = true; document.getElementById('f_btn').textContent = 'Post note'; out.innerHTML=''; document.getElementById('n_from').focus(); }
+      if (/^(col|colonel|ltc|)brand$/.test(a)) { remember({verified:1}); unlock(); out.innerHTML=''; document.getElementById('n_from').focus(); }
       else out.innerHTML = '<p class="note">That\'s not it. Think back to the LET classroom.</p>';
       return;
     }
@@ -456,13 +461,13 @@ function openNote(id){
     send({type:'note', id:p.id, name:g('n_from'), cls:g('n_cls'), msg:g('n_text'), email:g('c_email'), phone:g('c_phone'), pub:'yes'},
       `It shows on ${esc(p.name.split(' ')[0])}'s wall once the organizer approves it.`);
   });
-  document.getElementById('n_q').focus();
+  document.getElementById(ok ? (ME.name ? 'n_text' : 'n_from') : 'n_q').focus();
 }
 function openRsvp(){
   delete dlg.dataset.id;
   document.getElementById('card').innerHTML = formShell(null, 'RSVP · Reunion May 2027', 'Count me in',
     'In the 2002 book? Find yourself with the search box and use "This is me" on your card instead, so your RSVP is tied to your photo.',
-    inp('r_first','First name',{ac:'given-name'}) + inp('r_last','Last name',{ac:'family-name'}) + inp('r_cls','Class year (the year you graduated or would have)') +
+    inp('r_first','First name',{ac:'given-name',val:ea((ME.name||'').split(' ')[0])}) + inp('r_last','Last name',{ac:'family-name',val:ea((ME.name||'').split(' ').slice(1).join(' '))}) + inp('r_cls','Class year (the year you graduated or would have)',{val:ea(ME.cls)}) +
     inp('r_years','Years you attended NYMA (optional)') + sel('r_rsvp','Coming in May?',['Yes','Maybe']) + contactFields() +
     `<label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input id="r_pub" type="checkbox" checked style="width:auto"> Show my name and class year on the public list of expected attendees</label>`, 'Send RSVP');
   if (!dlg.open) dlg.showModal();
