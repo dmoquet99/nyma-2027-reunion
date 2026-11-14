@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Shrapnel 2002 Reunion</title>
+<title>NYMA Reunion May 2027</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
@@ -134,6 +134,24 @@ dialog::backdrop{background:rgba(5,9,18,.75)}
 .wn{background:#0d1528;border-left:3px solid var(--brass);padding:10px 12px;border-radius:0 4px 4px 0}
 .wn p{margin:0 0 4px;white-space:pre-wrap}
 .wn .by{font-size:13px;color:var(--muted)}
+.splash{background:linear-gradient(180deg,#1c2a47,var(--navy));border-bottom:3px solid var(--brass)}
+.splash-in{max-width:1200px;margin:0 auto;padding:40px 24px 34px;display:grid;gap:16px}
+.kicker{font-family:var(--display);font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--brass);font-size:15px}
+.splash h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(38px,6.4vw,78px);line-height:.95;margin:0;max-width:16ch;text-wrap:balance}
+.splash .lead{font-size:19px;max-width:62ch;margin:0}
+.splash-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:#33405e;border:1px solid #33405e;margin-top:6px}
+.splash-grid>div{background:var(--navy-2);padding:14px 16px}
+.splash-grid h3{font-family:var(--display);font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:16px;margin:0 0 4px;color:var(--brass)}
+.splash-grid p{margin:0;color:var(--ink);font-size:15px}
+.btn.big{padding:10px 18px;font-size:16px}
+.coming{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.att{display:flex;gap:10px;align-items:center;background:var(--navy-2);border:1px solid #26324d;border-radius:4px;padding:8px;color:inherit;text-align:left}
+.att img,.att .ph0{width:44px;height:54px;object-fit:cover;border-radius:3px;background:#0d1528;flex:none}
+.att small{display:block;color:var(--muted)}
+footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26324d;color:var(--muted);font-size:14px;display:grid;gap:6px}
+.optout{font-size:13px;color:var(--muted);margin:0}
+@media (max-width:760px){.splash-grid{grid-template-columns:1fr}}
+.hero h1.sub{font-size:clamp(28px,3.6vw,42px);line-height:1}
 .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--brass);color:var(--navy);padding:8px 14px;border-radius:3px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
 .toast.on{opacity:1}
 
@@ -149,18 +167,33 @@ dialog::backdrop{background:rgba(5,9,18,.75)}
 </head>
 <body>
 <header class="top">
-  <div class="mark">Shrapnel <span>’02</span></div>
+  <div class="mark">NYMA <span>’27</span></div>
   <nav aria-label="Sections">
     <a href="#wall" data-v="wall">The Wall</a>
     <a href="#book" data-v="book">The Book</a>
+    <a href="#coming" data-v="coming">Who's Coming</a>
     <a href="#find" data-v="find">Help Find Them</a>
   </nav>
   <div class="proto">New York Military Academy · Reunion May 2027</div>
 </header>
 
+<section class="splash" id="splash" aria-labelledby="splashH">
+  <div class="splash-in">
+    <div class="kicker">New York Military Academy · Reunion · May 2027</div>
+    <h2 id="splashH">We're beating the bushes for lost NYMA cadets.</h2>
+    <p class="lead">We're tracking down every cadet we can find to bring them back together at the 2027 Reunion in May. <b>Everyone is welcome</b>, whether you spent four years on campus or just one or two.</p>
+    <div class="splash-grid">
+      <div><h3>The weekend</h3><p>Details on room blocks and the itinerary will be shared as time permits. RSVP now so we know to count you in.</p></div>
+      <div><h3>Regiment of Graduates</h3><p>We're re-establishing the Regiment of Graduates. More information is coming soon.</p></div>
+      <div><h3>Not in the 2002 book?</h3><p>You're still invited. RSVP with your name and class year and you'll go on the list of expected attendees.</p></div>
+    </div>
+    <div class="actions"><button class="btn pri big" data-rsvp="1">RSVP for May</button><a class="btn big" href="#coming">See who's coming</a><button class="btn big" data-focus="jump">Find yourself in the book</button></div>
+  </div>
+</section>
+
 <section class="hero" id="hero">
   <div>
-    <h1>NYMA Reunion<br><em>May 2027</em></h1>
+    <h1 class="sub">Find a cadet <em>in the 2002 Shrapnel</em></h1>
     <div class="find" role="search">
       <label for="jump" class="sr">Find a cadet</label>
       <input id="jump" type="search" placeholder="Find a cadet by name" autocomplete="off" aria-controls="jumpList" aria-expanded="false">
@@ -202,17 +235,28 @@ dialog::backdrop{background:rgba(5,9,18,.75)}
     </div>
   </section>
 
+  <section id="v-coming" hidden>
+    <div class="bar" style="justify-content:space-between"><p class="note" style="margin:0">Cadets who've told us they're coming in May. Names are added once the organizer confirms the RSVP.</p><button class="btn pri" data-rsvp="1">Add me to the list</button></div>
+    <div class="coming" id="comingList"></div>
+  </section>
+
   <section id="v-find" hidden>
     <div class="bar"><p class="note" style="margin:0">These classmates haven't been found yet. Know where someone is? Open their card and tap <b>I know where they are</b>. If it's you, tap <b>This is me</b>.</p></div>
     <div class="wall" id="findWall"></div>
   </section>
 </main>
+<footer class="site">
+  <div>NYMA Reunion · May 2027 · Questions, RSVPs and leads: <b>nyma.reunion2027@gmail.com</b></div>
+  <div>Want your name or photo removed from this site? Email the organizer at nyma.reunion2027@gmail.com with the subject "Remove my info" and it will be taken down. <button class="btn" data-optout="">Write the removal email</button></div>
+  <div>Portraits and photos are from the 2002 Shrapnel yearbook.</div>
+</footer>
 
 <dialog id="dlg" aria-labelledby="pName"><div style="position:relative"><button class="x" id="dlgX" aria-label="Close">×</button><div class="card" id="card"></div></div></dialog>
 <div class="toast" id="toast" role="status"></div>
 
 <script src="data.js"></script>
 <script src="notes.js"></script>
+<script src="attendees.js"></script>
 <script>
 const ORGANIZER_EMAIL = 'nyma.reunion2027@gmail.com'; // reunion inbox: set before sharing
 const D = window.YB;
@@ -299,6 +343,7 @@ function openCard(id){
       ${m.map(f=>`<div class="maybe-row" data-k="${fk(f)}"><img src="${f.t}" alt=""><div class="q">Is this ${esc(p.name.split(' ')[0])}? <span class="note">Spread ${f.pg} · similarity ${f.sim.toFixed(2)}</span></div>
         <div class="yn"><button class="btn pri" data-yes="${fk(f)}">Yes</button><button class="btn" data-no="${fk(f)}">No</button><button class="btn" data-see="${f.pg}|${fk(f)}">See</button></div></div>`).join('')}
     </div></div>` : ''}
+    <p class="optout">Is this you and you'd rather not be listed? <button class="btn" data-optout="${p.id}">Ask to be removed</button></p>
   </div>`;
   dlg.dataset.id = id;
   if (location.hash.slice(1) !== id) history.replaceState(null,'','#'+id);
@@ -369,10 +414,65 @@ function openNote(id){
   });
   document.getElementById('n_q').focus();
 }
+function mailBlock(subj, body, note){
+  composed = subj + '\n\n' + body;
+  const href = 'mailto:'+ORGANIZER_EMAIL+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
+  return `<p class="sendto">${note} It goes to <b>${esc(ORGANIZER_EMAIL)}</b>.</p>
+    <div class="actions"><a class="btn pri" href="${href}" target="_blank" rel="noopener">Open in my email</a><button class="btn" data-copy="msg">Copy message</button><button class="btn" data-copy="addr">Copy address</button></div>
+    <p class="note">If your email app doesn't open, copy the message and the address and send it yourself.</p>`;
+}
+function openRsvp(){
+  document.getElementById('card').innerHTML = `<div class="left"><div class="noimg" style="aspect-ratio:auto;padding:24px 10px">All NYMA cadets welcome, any class, any length of stay.</div></div>
+  <div class="right"><div><div class="rkl">RSVP · Reunion May 2027</div><h2 id="pName">Count me in</h2></div>
+  <p class="note" style="margin:0">In the 2002 book? Find yourself with the search box and use "This is me" on your card instead, so your RSVP is tied to your photo. Everyone else, use this form.</p>
+  <form class="form" id="rf">
+    <label for="r_first">First name<input id="r_first" type="text" autocomplete="given-name"></label>
+    <label for="r_last">Last name<input id="r_last" type="text" autocomplete="family-name"></label>
+    <label for="r_cls">Class year (the year you graduated or would have)<input id="r_cls" type="text" inputmode="numeric"></label>
+    <label for="r_years">Years you attended NYMA (optional)<input id="r_years" type="text"></label>
+    <label for="r_rsvp">Coming in May? (yes / maybe)<input id="r_rsvp" type="text" value="yes"></label>
+    <label for="r_contact">Email or phone (organizer only, never posted)<input id="r_contact" type="text"></label>
+    <label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input id="r_pub" type="checkbox" checked style="width:auto"> Show my name and class year on the public list of expected attendees</label>
+    <div class="actions"><button class="btn pri" type="submit">Send RSVP</button></div>
+  </form><div id="out"></div></div>`;
+  delete dlg.dataset.id;
+  if (!dlg.open) dlg.showModal();
+  document.getElementById('rf').addEventListener('submit', ev => {
+    ev.preventDefault();
+    const g = i => document.getElementById(i).value.trim();
+    const out = document.getElementById('out');
+    if (!g('r_first') || !g('r_last') || !g('r_cls')) { out.innerHTML = '<p class="note">First name, last name and class year are required.</p>'; return; }
+    const pub = document.getElementById('r_pub').checked;
+    const subj = `RSVP May 2027: ${g('r_first')} ${g('r_last')}, Class of ${g('r_cls')}`;
+    const body = `First name: ${g('r_first')}\nLast name: ${g('r_last')}\nClass year: ${g('r_cls')}\nYears attended: ${g('r_years')}\nComing: ${g('r_rsvp')}\nContact (private): ${g('r_contact')}\nShow on public list: ${pub?'yes':'no'}\nIn the 2002 book: not listed`;
+    out.innerHTML = mailBlock(subj, body, 'Your RSVP is ready.' + (pub ? ' Your name goes on the public list once the organizer confirms it.' : ''));
+  });
+}
+function openOptout(id){
+  const p = id ? byId[id] : null;
+  const subj = 'Remove my info' + (p ? `: ${p.name}, Class of ${p.cls}` : '');
+  const body = p ? `Please remove my name, photo and any notes about me from the NYMA Reunion site.\nEntry: ${p.name} (${p.id})\nMy name:\nHow to reach me:` : `Please remove my name and photo from the NYMA Reunion site.\nMy name as it appears on the site:\nClass year:\nHow to reach me:`;
+  document.getElementById('card').innerHTML = `<div class="left"></div><div class="right"><div><div class="rkl">Opt out</div><h2 id="pName">Remove my info</h2></div>
+    <p class="note" style="margin:0">Send this to the organizer and your entry will be taken off the site.</p><div id="out">${mailBlock(subj, body, 'Your removal request is ready.')}</div></div>`;
+  if (!dlg.open) dlg.showModal();
+}
+function renderComing(){
+  const A = window.YB_ATTENDEES || [];
+  const el = document.getElementById('comingList');
+  if (!A.length) { el.innerHTML = '<p class="note">No confirmed RSVPs yet. Be the first on the list.</p>'; return; }
+  const sorted = [...A].sort((a,b)=> (a.cls||'').localeCompare(b.cls||'') || surname(a.name).localeCompare(surname(b.name)));
+  el.innerHTML = sorted.map(a => { const p = a.id && byId[a.id];
+    const img = p && p.portrait ? `<img src="${p.portrait}" alt="">` : '<span class="ph0"></span>';
+    return p ? `<button class="att tile-lite" data-id="${p.id}">${img}<span>${esc(p.name)}<small>Class of ${p.cls}${a.note?' · '+esc(a.note):''}</small></span></button>`
+             : `<div class="att">${img}<span>${esc(a.name)}<small>Class of ${esc(a.cls||'')}${a.note?' · '+esc(a.note):''}</small></span></div>`; }).join('');
+}
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toast.h); toast.h=setTimeout(()=>t.classList.remove('on'),2200); }
 
 document.addEventListener('click', e => {
-  const tl = e.target.closest('.tile'); if (tl) return openCard(tl.dataset.id);
+  const tl = e.target.closest('.tile, .tile-lite'); if (tl) return openCard(tl.dataset.id);
+  const rv = e.target.closest('[data-rsvp]'); if (rv) return openRsvp();
+  const oo = e.target.closest('[data-optout]'); if (oo) return openOptout(oo.dataset.optout);
+  const fc = e.target.closest('[data-focus]'); if (fc) { const j = document.getElementById(fc.dataset.focus); j.scrollIntoView({block:'center'}); return j.focus(); }
   const hot = e.target.closest('.hot'); if (hot) return openCard(hot.dataset.id);
   const th = e.target.closest('.th'); if (th) { dlg.close(); return gotoFace(th.dataset.pg, th.dataset.k); }
   const sb = e.target.closest('#strip button'); if (sb) { curPage = sb.dataset.pg; return renderSpread(); }
@@ -381,7 +481,7 @@ document.addEventListener('click', e => {
   const see = e.target.closest('[data-see]'); if (see) { const [pg,k]=see.dataset.see.split('|'); dlg.close(); return gotoFace(pg,k); }
   const act = e.target.closest('[data-act]'); if (act) return openForm(dlg.dataset.id, act.dataset.act);
   const cp = e.target.closest('[data-copy]'); if (cp) { const txt = cp.dataset.copy==='addr' ? ORGANIZER_EMAIL : composed; navigator.clipboard.writeText(txt).then(()=>toast('Copied'), ()=>toast('Select the text and copy it manually')); return; }
-  const bk = e.target.closest('[data-back]'); if (bk) return openCard(dlg.dataset.id);
+  const bk = e.target.closest('[data-back]'); if (bk) return dlg.dataset.id ? openCard(dlg.dataset.id) : dlg.close();
   const ch = e.target.closest('.chip[data-f]'); if (ch) { filter = ch.dataset.f; document.querySelectorAll('.chip[data-f]').forEach(c=>c.setAttribute('aria-pressed', c===ch)); return renderWall(); }
 });
 document.getElementById('dlgX').onclick = () => dlg.close();
@@ -414,8 +514,10 @@ jump.addEventListener('keydown', e => {
 jl.addEventListener('click', e => { const li = e.target.closest('li[data-id]'); if (li) goTo(li.dataset.id); });
 document.addEventListener('click', e => { if (!e.target.closest('.find')) jl.hidden = true; });
 function show(v){
-  ['wall','book','find'].forEach(x => document.getElementById('v-'+x).hidden = x!==v);
-  document.getElementById('hero').hidden = v==='book';
+  ['wall','book','find','coming'].forEach(x => document.getElementById('v-'+x).hidden = x!==v);
+  document.getElementById('hero').hidden = v==='book' || v==='coming';
+  document.getElementById('splash').hidden = v==='book';
+  if (v==='coming') renderComing();
   document.querySelectorAll('nav a').forEach(a => a.toggleAttribute('aria-current', a.dataset.v===v) || a.dataset.v===v && a.setAttribute('aria-current','page'));
   document.querySelectorAll('nav a').forEach(a => { if (a.dataset.v===v) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
   if (v==='book') renderSpread();
@@ -423,7 +525,7 @@ function show(v){
 function route(){
   const h = decodeURIComponent(location.hash.slice(1));
   if (byId[h]) { show('wall'); openCard(h); return; }
-  show(['wall','book','find'].includes(h) ? h : 'wall');
+  show(['wall','book','find','coming'].includes(h) ? h : 'wall');
 }
 window.addEventListener('hashchange', route);
 curPage = '9741';
