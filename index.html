@@ -110,6 +110,8 @@ dialog::backdrop{background:rgba(5,9,18,.75)}
 .card .left .tl-row img{width:44px;height:55px;object-fit:cover;border-radius:2px}
 .tl-row span{display:grid;gap:1px;font-size:13.5px}.tl-row small{color:var(--muted);font-size:12px}
 .ybadge{color:var(--brass)}
+h2.dept{font-family:inherit;font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--brass);margin:28px 0 10px;display:flex;gap:10px;align-items:baseline;border-bottom:1px solid #2a3552;padding-bottom:6px}
+h2.dept small{color:var(--muted);font-size:12px;letter-spacing:0}
 .card .right{padding:22px 26px;overflow:auto;display:flex;flex-direction:column;gap:22px}
 .card h2{font-family:var(--display);font-weight:800;font-size:40px;line-height:1;margin:0;text-transform:uppercase;text-wrap:balance}
 .card .rkl{font-family:var(--display);font-weight:600;letter-spacing:.1em;color:var(--brass);font-size:16px}
@@ -191,6 +193,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
     <a href="#book" data-v="book">The Book</a>
     <a href="#coming" data-v="coming">Who's Coming</a>
     <a href="#find" data-v="find">Help Find Them</a>
+    <a href="#faculty" data-v="faculty">Faculty &amp; Staff</a>
   </nav>
   <div class="proto">New York Military Academy · Reunion May 2027</div>
 </header>
@@ -259,6 +262,13 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
     <div class="coming" id="comingList"></div>
   </section>
 
+  <section id="v-faculty" hidden>
+    <div class="bar"><input id="fq" type="search" placeholder="Search faculty and staff" aria-label="Search faculty and staff">
+      <select id="fyb" aria-label="Yearbook" class="chip"><option value="">Both yearbooks</option><option value="2002">2002 Shrapnel</option><option value="2004">2004 Shrapnel</option></select>
+      <p class="note" style="margin:0">The officers, teachers and staff who ran NYMA, from the 2002 and 2004 Shrapnel. Tap anyone to leave a note on their wall.</p></div>
+    <div id="facList"></div>
+  </section>
+
   <section id="v-find" hidden>
     <div class="bar"><p class="note" style="margin:0">These classmates haven't been found yet. Know where someone is? Open their card and tap <b>I know where they are</b>. If it's you, tap <b>This is me</b>.</p></div>
     <div class="wall" id="findWall"></div>
@@ -295,8 +305,8 @@ function esc(s){ return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'
 
 function stats(){
   document.getElementById('sPeople').textContent = D.people.filter(p=>!p.staff).length;
-  document.getElementById('sTotal').textContent = D.people.filter(p=>!p.mem).length;
-  document.getElementById('sFound').textContent = D.people.filter(p=>!p.mem && FOUND[p.id]).length;
+  document.getElementById('sTotal').textContent = D.people.filter(p=>!p.staff && !p.mem).length;
+  document.getElementById('sFound').textContent = D.people.filter(p=>!p.staff && !p.mem && FOUND[p.id]).length;
   
 }
 
@@ -313,10 +323,10 @@ function renderWall(){
   const q = document.getElementById('q').value.trim().toLowerCase();
   const cl = document.getElementById('cls').value, yb = document.getElementById('yb').value;
   const inYb = p => !yb || (yb==='both' ? (p.yrs||[]).length>1 : (p.yrs||[]).some(y=>y.y===yb));
-  const list = D.people.filter(p => (!cl || p.cls===cl) && inYb(p) && (!q || p.name.toLowerCase().includes(q)) && (filter==='all' || (filter==='missing' && !p.mem && !FOUND[p.id]) || (filter==='found' && FOUND[p.id] && !p.mem) || (filter==='mem' && p.mem)));
+  const list = D.people.filter(p => !p.staff && (!cl || p.cls===cl) && inYb(p) && (!q || p.name.toLowerCase().includes(q)) && (filter==='all' || (filter==='missing' && !p.mem && !FOUND[p.id]) || (filter==='found' && FOUND[p.id] && !p.mem) || (filter==='mem' && p.mem)));
   document.getElementById('wall').innerHTML = list.length ? list.map(tile).join('') : `<p class="note">${filter==='found' ? 'No one has been found yet. Once a classmate claims their entry or a lead is confirmed, they show up here with a current photo next to their yearbook portrait.' : 'No one by that name.'}</p>`;
 }
-function renderFind(){ document.getElementById('findWall').innerHTML = D.people.filter(p=>!p.mem && !FOUND[p.id]).map(tile).join(''); }
+function renderFind(){ document.getElementById('findWall').innerHTML = D.people.filter(p=>!p.staff && !p.mem && !FOUND[p.id]).map(tile).join(''); }
 
 /* Book */
 let curPage = D.pages[0], showBoxes = true;
@@ -661,6 +671,8 @@ dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
 document.getElementById('q').addEventListener('input', renderWall);
 document.getElementById('cls').addEventListener('change', renderWall);
 document.getElementById('yb').addEventListener('change', renderWall);
+document.getElementById('fq').addEventListener('input', renderFaculty);
+document.getElementById('fyb').addEventListener('change', renderFaculty);
 document.getElementById('boxToggle').onclick = e => { showBoxes = !showBoxes; e.currentTarget.setAttribute('aria-pressed', showBoxes); renderSpread(); };
 
 const jump = document.getElementById('jump'), jl = document.getElementById('jumpList');
@@ -685,11 +697,29 @@ jump.addEventListener('keydown', e => {
 });
 jl.addEventListener('click', e => { const li = e.target.closest('li[data-id]'); if (li) goTo(li.dataset.id); });
 document.addEventListener('click', e => { if (!e.target.closest('.find')) jl.hidden = true; });
+const DEPTS = ['Administration','Commandant’s Department','JROTC','Faculty','Admissions','Athletics','Business Office','Development','Technology','Communications','Facilities','Mess Hall','Infirmary','Cadet Store'];
+function ftile(p){
+  const img = p.portrait ? `<img src="${p.portrait}" alt="${esc(p.name)}" loading="lazy">` : `<div class="noimg">No photo in the book</div>`;
+  const yrs = (p.yrs||[]).map(y=>'’'+y.y.slice(2)).join(' + ');
+  return `<button class="tile${p.mem?' mem':''}" data-id="${p.id}">${img}
+    <div class="cap"><span class="rk">${esc(p.role||'')}</span><span class="nm">${esc(p.name)}</span>
+    <span class="meta"><span>${yrs} Shrapnel</span>${p.mem?'<span class="dot">In memoriam</span>':''}</span></div></button>`;
+}
+function renderFaculty(){
+  const q = norm(document.getElementById('fq').value||''), yb = document.getElementById('fyb').value;
+  const S = D.people.filter(p => p.staff && (!q || norm(p.name+' '+(p.role||'')+' '+p.staff).includes(q)) && (!yb || p.yrs.some(y=>y.y===yb)));
+  const rank = p => /Superintendent/.test(p.role)?0:/Headmaster/.test(p.role)&&!/Assistant/.test(p.role)?1:/Commandant(?! for)/.test(p.role)&&!/Deputy/.test(p.role)?0:/Assistant Headmaster/.test(p.role)?2:/Chair|Deputy|Senior Army|Principal|Registrar/.test(p.role)?3:/Superintendent|Commandant|Director/.test(p.role)?4:9;
+  document.getElementById('facList').innerHTML = DEPTS.map(d => {
+    const g = S.filter(p=>p.staff===d).sort((a,b)=> rank(a)-rank(b) || surname(a.name).localeCompare(surname(b.name)));
+    return g.length ? `<h2 class="dept">${d.replace('Faculty','Faculty · Teachers')}<small>${g.length}</small></h2><div class="wall">${g.map(ftile).join('')}</div>` : '';
+  }).join('') || '<p class="note">No one by that name.</p>';
+}
 function show(v){
-  ['wall','book','find','coming'].forEach(x => document.getElementById('v-'+x).hidden = x!==v);
-  document.getElementById('hero').hidden = v==='book' || v==='coming';
+  ['wall','book','find','coming','faculty'].forEach(x => document.getElementById('v-'+x).hidden = x!==v);
+  document.getElementById('hero').hidden = v==='book' || v==='coming' || v==='faculty';
   document.getElementById('splash').hidden = v==='book';
   if (v==='coming') renderComing();
+  if (v==='faculty') renderFaculty();
   document.querySelectorAll('nav a').forEach(a => a.toggleAttribute('aria-current', a.dataset.v===v) || a.dataset.v===v && a.setAttribute('aria-current','page'));
   document.querySelectorAll('nav a').forEach(a => { if (a.dataset.v===v) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
   if (v==='book') renderSpread();
@@ -697,7 +727,7 @@ function show(v){
 function route(){
   const h = decodeURIComponent(location.hash.slice(1));
   if (byId[h]) { show('wall'); openCard(h); return; }
-  show(['wall','book','find','coming'].includes(h) ? h : 'wall');
+  show(['wall','book','find','coming','faculty'].includes(h) ? h : 'wall');
 }
 window.addEventListener('hashchange', route);
 curPage = '9741';
