@@ -492,18 +492,43 @@ function openOptout(id){
 }
 
 /* Match a typed name (and class year) to a cadet in the book */
-function nameParts(s){ const t = norm(s||'').split(/\s+/).filter(Boolean).filter(w=>!/^(jr|sr|ii|iii|iv)$/.test(w)); return t.length ? {first:t[0], last:t[t.length-1]} : null; }
-const NICK = {mike:'michael',mikey:'michael',bill:'william',will:'william',billy:'william',bob:'robert',rob:'robert',bobby:'robert',jim:'james',jimmy:'james',dan:'daniel',danny:'daniel',tony:'anthony',alex:'alexander',matt:'matthew',nick:'nicholas',ben:'benjamin',steve:'stephen',greg:'gregory',joe:'joseph',joey:'joseph',josh:'joshua',sam:'samuel',kate:'kathleen',katie:'kathleen',dave:'david',rick:'richard',rich:'richard',tom:'thomas',tommy:'thomas',jon:'jonathan',chris:'christopher',liz:'elizabeth',beth:'elizabeth',vic:'victoria',vicky:'victoria',doug:'douglas',ed:'edward',eddie:'edward',gene:'eugene',zack:'zachary',zach:'zachary',andy:'andrew',drew:'andrew',jake:'jacob',pete:'peter',ron:'ronald',ray:'raymond',fred:'frederick',vince:'vincent',phil:'philip',ken:'kenneth',kenny:'kenneth',larry:'lawrence',marc:'marcos',jorge:'jose'};
+const NICK = {mike:'michael',mikey:'michael',mick:'michael',bill:'william',will:'william',billy:'william',liam:'william',bob:'robert',rob:'robert',bobby:'robert',robbie:'robert',bert:'robert',jim:'james',jimmy:'james',jamie:'james',dan:'daniel',danny:'daniel',tony:'anthony',alex:'alexander',sasha:'alexander',matt:'matthew',nick:'nicholas',nicky:'nicholas',ben:'benjamin',benny:'benjamin',steve:'stephen',stevie:'stephen',greg:'gregory',joe:'joseph',joey:'joseph',josh:'joshua',sam:'samuel',sammy:'samuel',kate:'kathleen',katie:'kathleen',kathy:'kathleen',dave:'david',davey:'david',rick:'richard',rich:'richard',ricky:'richard',dick:'richard',tom:'thomas',tommy:'thomas',jon:'jonathan',johnny:'john',jack:'john',chris:'christopher',topher:'christopher',liz:'elizabeth',beth:'elizabeth',betsy:'elizabeth',lizzie:'elizabeth',vic:'victoria',vicky:'victoria',tori:'victoria',doug:'douglas',dougie:'douglas',ed:'edward',eddie:'edward',ted:'edward',gene:'eugene',zack:'zachary',zach:'zachary',andy:'andrew',drew:'andrew',jake:'jacob',pete:'peter',ron:'ronald',ronnie:'ronald',ray:'raymond',fred:'frederick',freddy:'frederick',freddie:'frederick',vince:'vincent',vinny:'vincent',vinnie:'vincent',phil:'philip',ken:'kenneth',kenny:'kenneth',larry:'lawrence',marc:'marcos',jorge:'jose',peggy:'margaret',meg:'margaret',maggie:'margaret',jen:'jennifer',jenny:'jennifer',jess:'jessica',sue:'susan',suzy:'susan',debbie:'deborah',deb:'deborah',al:'albert',hank:'henry',harry:'henry',chuck:'charles',charlie:'charles',chas:'charles',gerry:'gerald',jerry:'gerald',walt:'walter',wally:'walter',lou:'louis',manny:'manuel',pat:'patrick',paddy:'patrick',stan:'stanley',terry:'terrence',tim:'timothy',timmy:'timothy',nate:'nathaniel',nat:'nathaniel',sean:'shawn',shaun:'shawn',kris:'kristian',kristy:'kristen',christy:'christina',tina:'christina',cassie:'cassandra',mo:'mohammed',mohamed:'mohammed',muhammad:'mohammed',vlad:'vladislav',slava:'vladislav',yura:'yury',yuri:'yury',igor:'igor',zhenya:'eugene',dima:'dmitri',kostya:'konstantin',misha:'michael',kolya:'nikolai',nikolay:'nikolai'};
 const canon = n => NICK[n] || n;
-const firstOk = (a,b) => { a = canon(a); b = canon(b); return a===b || (a.length>=3 && b.length>=3 && (a.startsWith(b) || b.startsWith(a))) || (a[0]===b[0] && (a.startsWith('christ') && b.startsWith('christ'))); };
+function lev(a,b){ const m=a.length,n=b.length; if(Math.abs(m-n)>2) return 9; let p=[...Array(n+1).keys()];
+  for(let i=1;i<=m;i++){ const c=[i]; for(let j=1;j<=n;j++) c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1)); p=c; } return p[n]; }
+function firstScore(a,b){ // 3 exact/nickname, 2 shared 3-letter start, 0 none
+  if (a===b || canon(a)===canon(b) || canon(a)===b || a===canon(b)) return 3;
+  const A=canon(a), B=canon(b);
+  if (A.length>=3 && B.length>=3 && A.slice(0,3)===B.slice(0,3)) return 2;
+  if (a.length>=3 && b.length>=3 && a.slice(0,3)===b.slice(0,3)) return 2;
+  return 0;
+}
+function lastScore(a,b){ // 3 exact, 2 one typo, 1 two typos on long names
+  const ca=a.replace(/[^a-z]/g,''), cb=b.replace(/[^a-z]/g,'');
+  if (ca===cb) return 3; const d=lev(ca,cb);
+  if (d===1 && ca.length>=5) return 2; if (d===2 && ca.length>=7) return 1; return 0;
+}
+function lastOf(s){ const t = norm((s||'').replace(/-/g,' ')).split(/\s+/).filter(Boolean).filter(w=>!/^(jr|sr|ii|iii|iv)$/.test(w)); return t; }
 function matchPerson(name, cls){
-  const q = nameParts(name); if (!q) return null;
+  const q = lastOf(name); if (q.length < 2) return null;
   let c = String(cls||'').replace(/\D/g,''); if (c.length===2) c = '20'+c; c = c.slice(-4);
-  let hits = D.people.filter(p => { const n = nameParts(p.name); return n && n.last===q.last && firstOk(n.first,q.first); });
-  if (hits.length > 1 && c) hits = hits.filter(p => p.cls===c);
-  if (hits.length !== 1) return null;
-  if (c && hits[0].cls !== c && canon(nameParts(hits[0].name).first)!==canon(q.first)) return null;
-  return hits[0];
+  const qf = q[0], ql = q[q.length-1], qlJoined = q.slice(1).join('');
+  const scored = [];
+  for (const p of D.people){
+    const t = lastOf(p.name); if (t.length < 2) continue;
+    const pf = t[0], pl = t[t.length-1], plJoined = t.slice(1).join('');
+    const ls = Math.max(lastScore(ql,pl), lastScore(qlJoined,plJoined), lastScore(ql,plJoined), ...t.slice(1).map(x => x.length>=4 ? Math.min(lastScore(ql,x),3) : 0));
+    const fs = firstScore(qf,pf);
+    if (!ls || !fs) continue;
+    const yr = !c ? 0 : (p.cls===c ? 2 : -3);
+    if (ls < 3 && yr <= 0) continue;          // typo'd last name needs matching class year
+    if (fs < 3 && ls < 3) continue;           // can't be loose on both names
+    scored.push({p, s: ls*2 + fs + yr});
+  }
+  if (!scored.length) return null;
+  scored.sort((a,b)=>b.s-a.s);
+  if (scored.length > 1 && scored[1].s === scored[0].s) return null;   // ambiguous: don't guess
+  return scored[0].s >= 7 ? scored[0].p : null;
 }
 
 /* Approved submissions from the organizer's sheet */
