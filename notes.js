@@ -1,0 +1,1 @@
+window.YB_NOTES = {};
