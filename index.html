@@ -173,6 +173,8 @@ h2.dept small{color:var(--muted);font-size:12px;letter-spacing:0}
 .splash-grid h3{font-family:var(--display);font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:16px;margin:0 0 4px;color:var(--brass)}
 .splash-grid p{margin:0;color:var(--ink);font-size:15px}
 .btn.big{padding:10px 18px;font-size:16px}
+.btn.wa{border-color:#25d366;color:#e9e4d8}.btn.wa::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:#25d366;margin-right:8px;vertical-align:1px}
+.wabox{margin-top:14px;padding:12px 14px;border:1px solid #25d366;border-radius:4px;background:rgba(37,211,102,.07)}.wabox p{margin:0 0 8px}
 .coming{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
 .att{display:flex;gap:10px;align-items:center;background:var(--navy-2);border:1px solid #26324d;border-radius:4px;padding:8px;color:inherit;text-align:left}
 .att img,.att .ph0{width:44px;height:54px;object-fit:cover;border-radius:3px;background:#0d1528;flex:none}
@@ -220,7 +222,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
       <div><h3>Regiment of Graduates</h3><p>We're re-establishing the Regiment of Graduates. More information is coming soon.</p></div>
       <div><h3>Not in the yearbooks?</h3><p>You're still invited. RSVP with your name and class year and you'll go on the list of expected attendees.</p></div>
     </div>
-    <div class="actions"><button class="btn pri big" data-rsvp="1">RSVP for May</button><a class="btn big" href="#coming">See who's coming</a><button class="btn big" data-focus="jump">Find yourself in the book</button></div>
+    <div class="actions"><button class="btn pri big" data-rsvp="1">RSVP for May</button><a class="btn big" href="#coming">See who's coming</a><button class="btn big" data-focus="jump">Find yourself in the book</button><a class="btn big wa" href="https://chat.whatsapp.com/FUy64tbJuvyKAiCzV8Zml9" target="_blank" rel="noopener">Join the WhatsApp group</a></div>
   </div>
 </section>
 
@@ -274,7 +276,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
   </section>
 
   <section id="v-coming" hidden>
-    <div class="bar" style="justify-content:space-between"><p class="note" style="margin:0">Cadets who've told us they're coming May 14–16. New RSVPs show up here within a few minutes.</p><button class="btn pri" data-rsvp="1">Add me to the list</button></div>
+    <div class="bar" style="justify-content:space-between"><p class="note" style="margin:0">Cadets who've told us they're coming May 14–16. New RSVPs show up here within a few minutes.</p><span class="actions"><a class="btn wa" href="https://chat.whatsapp.com/FUy64tbJuvyKAiCzV8Zml9" target="_blank" rel="noopener">Join the WhatsApp group</a><button class="btn pri" data-rsvp="1">Add me to the list</button></span></div>
     <div class="ccount" id="comingCount"></div>
     <div class="coming" id="comingList"></div>
   </section>
@@ -294,6 +296,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
 </main>
 <footer class="site">
   <div>NYMA Reunion · May 14–16, 2027 · Questions, RSVPs and leads: <b>nyma.reunion2027@gmail.com</b></div>
+  <div>Reunion group chat: <a class="btn wa" href="https://chat.whatsapp.com/FUy64tbJuvyKAiCzV8Zml9" target="_blank" rel="noopener">Join the WhatsApp group</a></div>
   <div>Want your name or photo removed from this site? <button class="btn" data-optout="">Request removal</button></div>
   <div>Portraits and photos are from the 2000, 2002 and 2004 Shrapnel yearbooks.</div>
 </footer>
@@ -453,15 +456,17 @@ const ea = s => String(s||'').replace(/"/g,'&quot;');
 const contactFields = () => inp('c_email','Email (optional, for reunion updates; never posted)',{type:'email',ac:'email',val:ea(ME.email)}) + inp('c_phone','Phone (optional, organizer only)',{type:'tel',ac:'tel',val:ea(ME.phone)});
 const g = i => (document.getElementById(i)?.value || '').trim();
 const blank = () => ![...document.querySelectorAll('#f input:not([type=checkbox]), #f textarea')].some(e => e.value.trim());
-function done(msg){
+const WHATSAPP = 'https://chat.whatsapp.com/FUy64tbJuvyKAiCzV8Zml9';
+function done(msg, type){
   const out = document.getElementById('out'), f = document.getElementById('f');
   if (f) f.hidden = true;
-  out.innerHTML = `<p class="sendto" style="font-size:16px"><b>Thanks, it's in.</b> ${msg}</p>`;
+  out.innerHTML = `<p class="sendto" style="font-size:16px"><b>Thanks, it's in.</b> ${msg}</p>` +
+    (type==='rsvp' || type==='claim' ? `<div class="wabox"><p><b>Join the reunion group chat.</b> Classmates are catching up and sharing plans for May 14–16 on WhatsApp.</p><a class="btn pri" href="${WHATSAPP}" target="_blank" rel="noopener">Join the WhatsApp group</a></div>` : '');
 }
 async function send(v, msg){
   const out = document.getElementById('out'), b = document.getElementById('f_btn');
   b.disabled = true; b.textContent = 'Sending…';
-  try { await submitEntry(v); remember({email:v.email, phone:v.phone, verified:1, ...(v.type!=='lead' && v.type!=='removal' ? {name:v.name, cls:v.cls} : {})}); done(msg); }
+  try { await submitEntry(v); remember({email:v.email, phone:v.phone, verified:1, ...(v.type!=='lead' && v.type!=='removal' ? {name:v.name, cls:v.cls} : {})}); done(msg, v.type); }
   catch(e){ b.disabled = false; b.textContent = 'Try again'; out.innerHTML = `<p class="note">That didn't go through. Check your connection and try again, or email ${esc(ORGANIZER_EMAIL)}.</p>`; }
 }
 function bindForm(handler){
