@@ -297,6 +297,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
 <footer class="site">
   <div>NYMA Reunion · May 14–16, 2027 · Questions, RSVPs and leads: <b>nyma.reunion2027@gmail.com</b></div>
   <div>Reunion group chat: <a class="btn wa" href="https://chat.whatsapp.com/FUy64tbJuvyKAiCzV8Zml9" target="_blank" rel="noopener">Join the WhatsApp group</a></div>
+  <div class="note" style="margin:0">Visits are counted anonymously: a random ID in your browser, no names or IP addresses.</div>
   <div>Want your name or photo removed from this site? <button class="btn" data-optout="">Request removal</button></div>
   <div>Portraits and photos are from the 2000, 2002 and 2004 Shrapnel yearbooks.</div>
 </footer>
@@ -775,6 +776,27 @@ loadApproved();
     const d = document.createElement('div'); d.className='toast show'; d.style.cssText='position:fixed;left:50%;top:80px;transform:translateX(-50%);z-index:99;background:#c8a95e;color:#0b1222;padding:14px 20px;border-radius:6px;font-weight:700';
     d.textContent = 'Done. You won\'t get any more wall-note emails.'; document.body.appendChild(d);
     history.replaceState(null,'',location.pathname+location.hash); setTimeout(()=>d.remove(),8000); });
+})();
+
+// Anonymous visit counter: a random ID in this browser, the page or card viewed, and the referring site. No names, no IP addresses.
+// Open nyma2027.com/?notrack once on a device to stop counting that device.
+(function(){
+  const U='https://script.google.com/macros/s/AKfycbxNQGkPxfECvAJ_9um_isyhkpnj2QhLtWZZ34e-a6EwqgfQp-fIN8YaEVpEPz8G6f5E/exec';
+  let v='';
+  try {
+    if (/[?&]notrack\b/.test(location.search)) localStorage.setItem('yb-notrack','1');
+    if (localStorage.getItem('yb-notrack')) return;
+    v = localStorage.getItem('yb-vid');
+    if (!v) { v = Math.random().toString(36).slice(2,12) + Date.now().toString(36); localStorage.setItem('yb-vid', v); }
+  } catch(e) { v = 'anon' + Math.random().toString(36).slice(2,10); }
+  let ref = '';
+  try { if (document.referrer) { const h = new URL(document.referrer).hostname; if (h && h !== location.hostname) ref = h; } } catch(e){}
+  const hit = p => { try { new Image().src = U + '?a=hit&v=' + v + '&p=' + encodeURIComponent(p) + '&r=' + encodeURIComponent(ref); ref=''; } catch(e){} };
+  let last = '';
+  const page = () => { const h = decodeURIComponent(location.hash.slice(1)) || 'wall';
+    const p = (window.YB && YB.people && YB.people.some(x => x.id === h)) ? '#' + h : h;
+    if (p !== last) { last = p; hit(p); } };
+  page(); addEventListener('hashchange', page);
 })();
 </script>
 </body>
