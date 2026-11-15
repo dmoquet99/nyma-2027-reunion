@@ -145,7 +145,7 @@ h2.dept small{color:var(--muted);font-size:12px;letter-spacing:0}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 .x{position:absolute;right:10px;top:8px;background:none;border:none;color:var(--muted);font-size:26px;line-height:1}
 .note{font-size:13px;color:var(--muted);max-width:65ch}
-.form{display:grid;gap:10px}
+.form{display:grid;gap:10px}.form[hidden]{display:none}
 .form label{display:grid;gap:4px;font-size:14px;color:var(--muted)}
 .form input,.form textarea{background:#0d1528;border:1px solid #33405e;color:var(--ink);padding:9px 10px;font:inherit;border-radius:3px}
 .form textarea{min-height:84px;resize:vertical}
@@ -461,7 +461,7 @@ const blank = () => ![...document.querySelectorAll('#f input:not([type=checkbox]
 const WHATSAPP = 'https://chat.whatsapp.com/FUy64tbJuvyKAiCzV8Zml9';
 function done(msg, type){
   const out = document.getElementById('out'), f = document.getElementById('f');
-  if (f) f.hidden = true;
+  if (f) { f.hidden = true; f.style.display = 'none'; }
   out.innerHTML = `<p class="sendto" style="font-size:16px"><b>Thanks, it's in.</b> ${msg}</p>` +
     (type==='rsvp' || type==='claim' ? `<div class="wabox"><p><b>Join the reunion group chat.</b> Classmates are catching up and sharing plans for May 14–16 on WhatsApp.</p><a class="btn pri" href="${WHATSAPP}" target="_blank" rel="noopener">Join the WhatsApp group</a></div>` : '');
 }
