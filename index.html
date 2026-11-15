@@ -110,6 +110,11 @@ dialog::backdrop{background:rgba(5,9,18,.75)}
 .card .left .tl-row img{width:44px;height:55px;object-fit:cover;border-radius:2px}
 .tl-row span{display:grid;gap:1px;font-size:13.5px}.tl-row small{color:var(--muted);font-size:12px}
 .ybadge{color:var(--brass)}
+.ccount{display:flex;gap:12px;margin:6px 0 18px;flex-wrap:wrap}
+.ccount div{flex:1;min-width:120px;border:2px solid var(--brass);border-radius:6px;padding:12px 16px;text-align:center}
+.ccount b{display:block;font-size:40px;line-height:1;color:var(--brass)}
+.ccount span{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.ccount .tot{background:var(--brass)}.ccount .tot b,.ccount .tot span{color:#0b1222}
 .bigdate{font-size:clamp(34px,6vw,64px);font-weight:800;letter-spacing:.02em;line-height:1;color:var(--brass);margin:2px 0 4px}
 .who{display:flex;gap:0;max-width:1200px;margin:22px auto 4px;padding:0 24px}
 .who a{flex:1;text-align:center;padding:16px 12px;font-size:19px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;color:var(--ink);border:2px solid var(--brass);background:transparent}
@@ -270,6 +275,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
 
   <section id="v-coming" hidden>
     <div class="bar" style="justify-content:space-between"><p class="note" style="margin:0">Cadets who've told us they're coming May 14–16. New RSVPs show up here within a few minutes.</p><button class="btn pri" data-rsvp="1">Add me to the list</button></div>
+    <div class="ccount" id="comingCount"></div>
     <div class="coming" id="comingList"></div>
   </section>
 
@@ -637,7 +643,8 @@ async function loadApproved(){
       if (p) { FOUND[p.id] = 1; att.push({id:p.id, name:p.name, cls:p.cls, note}); }
       else if ((pub||'').toLowerCase()==='yes') att.push({name, cls, note}); }
   }
-  const seen = new Set(); window.YB_ATTENDEES = att.filter(a => { const k = a.id || ('n:'+norm(a.name)+a.cls); if (seen.has(k)) return false; seen.add(k); return true; });
+  const seen = new Set(); window.YB_ATTENDEES = att.reverse().filter(a => { const k = a.id || ('n:'+norm(a.name)+a.cls); if (seen.has(k)) return false; seen.add(k); return true; });
+  { const nl = document.querySelector('nav a[data-v="coming"]'); if (nl) nl.textContent = `Who's Coming (${window.YB_ATTENDEES.length})`; }
   if (Object.keys(removed).length){
     D.people = D.people.filter(p => !removed[p.id]); D.faces = D.faces.filter(f => !removed[f.w]);
     Object.keys(removed).forEach(k => delete byId[k]);
@@ -649,6 +656,9 @@ async function loadApproved(){
 function renderComing(){
   const A = window.YB_ATTENDEES || [];
   const el = document.getElementById('comingList');
+  const may = A.filter(a=>a.note==='maybe').length, yes = A.length - may;
+  document.getElementById('comingCount').innerHTML = `<div><b>${yes}</b><span>Coming</span></div><div><b>${may}</b><span>Maybe</span></div><div class="tot"><b>${A.length}</b><span>Total RSVPs</span></div>`;
+  const nl = document.querySelector('nav a[data-v="coming"]'); if (nl) nl.textContent = `Who's Coming (${A.length})`;
   if (!A.length) { el.innerHTML = '<p class="note">No confirmed RSVPs yet. Be the first on the list.</p>'; return; }
   const sorted = [...A].sort((a,b)=> (a.cls||'').localeCompare(b.cls||'') || surname(a.name).localeCompare(surname(b.name)));
   el.innerHTML = sorted.map(a => { const p = a.id && byId[a.id];
