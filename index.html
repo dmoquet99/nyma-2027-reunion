@@ -269,7 +269,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
   </section>
 
   <section id="v-coming" hidden>
-    <div class="bar" style="justify-content:space-between"><p class="note" style="margin:0">Cadets who've told us they're coming in May. Names are added once the organizer confirms the RSVP.</p><button class="btn pri" data-rsvp="1">Add me to the list</button></div>
+    <div class="bar" style="justify-content:space-between"><p class="note" style="margin:0">Cadets who've told us they're coming May 14–16. New RSVPs show up here within a few minutes.</p><button class="btn pri" data-rsvp="1">Add me to the list</button></div>
     <div class="coming" id="comingList"></div>
   </section>
 
@@ -465,13 +465,13 @@ function openForm(id, kind){
   if (kind==='note') return openNote(id);
   const p = byId[id], me = kind==='me';
   if (me) {
-    document.getElementById('card').innerHTML = formShell(p, 'Claim your entry', p.name, 'Your city, work and link show on your card once the organizer approves. Email and phone stay private.',
+    document.getElementById('card').innerHTML = formShell(p, 'Claim your entry', p.name, 'Your city, work and link show on your card within a few minutes. Email and phone stay private.',
       sel('m_rsvp','Coming to the reunion, May 14–16, 2027?',['Yes','Maybe','No']) + inp('m_city','Where you live now') + inp('m_work','What you do') +
       inp('m_link','Your LinkedIn, Facebook or other link') + inp('m_note','Anything for the class',{ta:1}) + contactFields(), 'Send it');
     bindForm(out => {
       const det = [['Coming',g('m_rsvp')],['City',g('m_city')],['Work',g('m_work')],['Link',g('m_link')]].filter(x=>x[1]).map(x=>x.join(': ')).join('\n');
       send({type:'claim', id:p.id, name:p.name, cls:p.cls, msg:g('m_note'), det, email:g('c_email'), phone:g('c_phone'), pub:'yes'},
-        'Your card updates once the organizer approves it.' + (g('m_rsvp')!=='No' ? ' You\'ll also go on the Who\'s Coming list.' : ''));
+        'Your card updates within a few minutes.' + (g('m_rsvp')!=='No' ? ' You\'ll also go on the Who\'s Coming list.' : ''));
     });
   } else {
     document.getElementById('card').innerHTML = formShell(p, 'Send a lead', p.name, 'Leads go only to the organizer. Nothing you write here is posted.',
@@ -533,7 +533,7 @@ function openRsvp(){
     if (blank()) { out.innerHTML = '<p class="note">The form is empty.</p>'; return; }
     const pub = document.getElementById('r_pub').checked;
     send({type:'rsvp', name:(g('r_first')+' '+g('r_last')).trim(), cls:g('r_cls'), det:`Coming: ${g('r_rsvp')}`+(g('r_years')?`\nYears attended: ${g('r_years')}`:''), email:g('c_email'), phone:g('c_phone'), pub: pub?'yes':'no'},
-      pub ? 'Your name goes on the Who\'s Coming list once the organizer confirms it.' : 'The organizer has your RSVP.');
+      pub ? 'Your name goes on the Who\'s Coming list within a few minutes.' : 'The organizer has your RSVP.');
   });
 }
 function openMemorial(id){
