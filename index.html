@@ -304,9 +304,9 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
 <dialog id="dlg" aria-labelledby="pName"><div style="position:relative"><button class="x" id="dlgX" aria-label="Close">×</button><div class="card" id="card"></div></div></dialog>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="data.js?v=58e651f0"></script>
-<script src="notes.js?v=58e651f0"></script>
-<script src="attendees.js?v=58e651f0"></script>
+<script src="data.js?v=e79d0777"></script>
+<script src="notes.js?v=e79d0777"></script>
+<script src="attendees.js?v=e79d0777"></script>
 <script>
 const ORGANIZER_EMAIL = 'nyma.reunion2027@gmail.com'; // reunion inbox: set before sharing
 const D = window.YB;
@@ -335,7 +335,7 @@ function stats(){
 function tile(p){
   const n = tagged(p.id).length;
   const status = p.mem ? 'In memoriam' : FOUND[p.id] ? 'Found' : 'Not found yet';
-  const img = p.portrait ? `<img src="${p.portrait}" alt="${esc(p.name)}, yearbook portrait" loading="lazy">` : `<div class="noimg">Photo not available in the book</div>`;
+  const img = p.portrait ? `<img src="${pic(p)}" alt="${esc(p.name)}, yearbook portrait" loading="lazy">` : `<div class="noimg">Photo not available in the book</div>`;
   return `<button class="tile${p.mem?' mem':''}" data-id="${p.id}">${img}
     <div class="cap"><span class="rk">${p.rank ? p.rank+' · ' : ''}${clsL(p)}${(p.yrs||[]).length>1?' · <span class="ybadge">’02 + ’04</span>':''}</span><span class="nm">${esc(p.name)}</span>
     <span class="meta"><span>In ${n} photo${n===1?'':'s'}${((window.YB_NOTES||{})[p.id]||[]).length?' · '+(window.YB_NOTES[p.id].length)+' notes':''}</span><span class="dot${FOUND[p.id]&&!p.mem?' found':''}">${status}</span></span></div></button>`;
@@ -380,7 +380,7 @@ const dlg = document.getElementById('dlg');
 function openCard(id){
   const p = byId[id], t = tagged(id), m = maybes(id), notes = (window.YB_NOTES||{})[id] || [];
   document.getElementById('card').innerHTML = `
-  <div class="left">${p.portrait ? `<img id="mainPort" src="${p.portrait}" alt="${esc(p.name)}, yearbook portrait">` : '<div class="noimg">Photo not available in the book</div>'}
+  <div class="left">${p.portrait ? `<img id="mainPort" src="${pic(p)}" alt="${esc(p.name)}, yearbook portrait">` : '<div class="noimg">Photo not available in the book</div>'}
     <div class="note" id="mainCap">${portCap(p, (p.yrs||[]).find(y=>y.img===p.portrait))}</div>
     ${timelineHtml(p)}</div>
   <div class="right">
@@ -410,6 +410,7 @@ function openCard(id){
   if (location.hash.slice(1) !== id) history.replaceState(null,'','#'+id);
   if (!dlg.open) dlg.showModal();
 }
+function pic(p){ return p.cover || p.portrait; }
 function portCap(p, y){
   if (!y) return '';
   return `${y.y} Shrapnel · ${y.cls==='staff' ? 'staff portrait' : y.cls === y.y ? 'senior portrait' : 'Class of '+y.cls+' portrait'} · spread ${y.page}`;
@@ -440,7 +441,7 @@ async function submitEntry(v){
 }
 const emailOk = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 function formShell(p, kicker, title, intro, fieldsHtml, btn){
-  const left = p ? `<div class="left">${p.portrait?`<img src="${p.portrait}" alt="">`:''}<div class="note">${esc(p.name)}, ${clsL(p)}</div></div>`
+  const left = p ? `<div class="left">${p.portrait?`<img src="${pic(p)}" alt="">`:''}<div class="note">${esc(p.name)}, ${clsL(p)}</div></div>`
                  : `<div class="left"><div class="noimg" style="aspect-ratio:auto;padding:24px 10px">All NYMA cadets welcome, any class, any length of stay.</div></div>`;
   return `${left}<div class="right"><div><div class="rkl">${kicker}</div><h2 id="pName">${esc(title)}</h2></div>
     ${intro?`<p class="note" style="margin:0">${intro}</p>`:''}
@@ -540,7 +541,7 @@ function openRsvp(){
   if (!dlg.open) dlg.showModal();
   const hint = document.createElement('div'); hint.id = 'r_hint'; document.getElementById('f').prepend(hint);
   const check = () => { const p = matchPerson(g('r_first')+' '+g('r_last'), g('r_cls'));
-    hint.innerHTML = p ? `<div class="maybe-row" style="border-style:solid">${p.portrait?`<img src="${p.portrait}" alt="">`:''}<div class="q"><b>You're in the Shrapnel.</b> Is this you: ${esc(p.name)}, Class of ${p.cls}?</div><div class="yn"><button class="btn pri" type="button" data-claim="${p.id}">Yes, use my card</button></div></div>` : ''; };
+    hint.innerHTML = p ? `<div class="maybe-row" style="border-style:solid">${p.portrait?`<img src="${pic(p)}" alt="">`:''}<div class="q"><b>You're in the Shrapnel.</b> Is this you: ${esc(p.name)}, Class of ${p.cls}?</div><div class="yn"><button class="btn pri" type="button" data-claim="${p.id}">Yes, use my card</button></div></div>` : ''; };
   ['r_first','r_last','r_cls'].forEach(i => document.getElementById(i).addEventListener('input', check));
   bindForm(out => {
     if (blank()) { out.innerHTML = '<p class="note">The form is empty.</p>'; return; }
@@ -669,7 +670,7 @@ function renderComing(){
   if (!A.length) { el.innerHTML = '<p class="note">No confirmed RSVPs yet. Be the first on the list.</p>'; return; }
   const sorted = [...A].sort((a,b)=> (a.cls||'').localeCompare(b.cls||'') || surname(a.name).localeCompare(surname(b.name)));
   el.innerHTML = sorted.map(a => { const p = a.id && byId[a.id];
-    const img = p && p.portrait ? `<img src="${p.portrait}" alt="">` : '<span class="ph0"></span>';
+    const img = p && p.portrait ? `<img src="${pic(p)}" alt="">` : '<span class="ph0"></span>';
     return p ? `<button class="att tile-lite" data-id="${p.id}">${img}<span>${esc(p.name)}<small>Class of ${p.cls}${a.note?' · '+esc(a.note):''}</small></span></button>`
              : `<div class="att">${img}<span>${esc(a.name)}<small>Class of ${esc(a.cls||'')}${a.note?' · '+esc(a.note):''}</small></span></div>`; }).join('');
 }
@@ -715,7 +716,7 @@ function renderJump(){
   const parts = q.split(/\s+/);
   jres = D.people.filter(p => { const n = norm(p.name); return parts.every(w => n.split(' ').some(t => t.startsWith(w)) || n.includes(w)); }).slice(0,12);
   jsel = 0;
-  jl.innerHTML = jres.length ? jres.map((p,i)=>`<li role="option" data-id="${p.id}" aria-selected="${i===0}">${p.portrait?`<img src="${p.portrait}" alt="">`:'<span class="ph0"></span>'}<span>${esc(p.name)}</span><small>${clsL(p)}</small></li>`).join('') : '<li aria-disabled="true">No cadet by that name in the yearbooks</li>';
+  jl.innerHTML = jres.length ? jres.map((p,i)=>`<li role="option" data-id="${p.id}" aria-selected="${i===0}">${p.portrait?`<img src="${pic(p)}" alt="">`:'<span class="ph0"></span>'}<span>${esc(p.name)}</span><small>${clsL(p)}</small></li>`).join('') : '<li aria-disabled="true">No cadet by that name in the yearbooks</li>';
   jl.hidden = false; jump.setAttribute('aria-expanded','true');
 }
 function goTo(id){ jl.hidden = true; jump.value = ''; location.hash = id; }
