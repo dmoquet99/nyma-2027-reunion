@@ -471,7 +471,7 @@ function openForm(id, kind){
   if (kind==='note') return openNote(id);
   const p = byId[id], me = kind==='me';
   if (me) {
-    document.getElementById('card').innerHTML = formShell(p, 'Claim your entry', p.name, 'Your city, work and link show on your card within a few minutes. Email and phone stay private.',
+    document.getElementById('card').innerHTML = formShell(p, 'Claim your entry', p.name, 'Your city, work and link show on your card within a few minutes. Email and phone stay private. Add your email and we\'ll send you a daily summary when someone posts on your wall or on a wall you\'ve posted on.',
       sel('m_rsvp','Coming to the reunion, May 14–16, 2027?',['Yes','Maybe','No']) + inp('m_city','Where you live now') + inp('m_work','What you do') +
       inp('m_link','Your LinkedIn, Facebook or other link') + inp('m_note','Anything for the class',{ta:1}) + contactFields(), 'Send it');
     bindForm(out => {
@@ -760,6 +760,14 @@ window.addEventListener('hashchange', route);
 curPage = '9741';
 stats(); renderWall(); renderFind(); route();
 loadApproved();
+
+(function(){ const u = new URLSearchParams(location.search).get('unsub');
+  if (!u) return;
+  submitEntry({type:'unsub', email:u, msg:'Unsubscribed from wall-note emails', pub:'no'}).finally(() => {
+    const d = document.createElement('div'); d.className='toast show'; d.style.cssText='position:fixed;left:50%;top:80px;transform:translateX(-50%);z-index:99;background:#c8a95e;color:#0b1222;padding:14px 20px;border-radius:6px;font-weight:700';
+    d.textContent = 'Done. You won\'t get any more wall-note emails.'; document.body.appendChild(d);
+    history.replaceState(null,'',location.pathname+location.hash); setTimeout(()=>d.remove(),8000); });
+})();
 </script>
 </body>
 </html>
