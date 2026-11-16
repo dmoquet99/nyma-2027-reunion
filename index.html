@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NYMA Reunion · May 14–16, 2027</title>
-<meta name="description" content="We're beating the bushes for lost NYMA cadets. Find yourself in the 2000, 2002 and 2004 Shrapnel, claim your card and RSVP for the reunion, May 14–16, 2027.">
+<meta name="description" content="We're beating the bushes for lost NYMA cadets. Find yourself in the 1979, 1980, 2000, 2002 and 2004 Shrapnel, claim your card and RSVP for the reunion, May 14–16, 2027.">
 <meta property="og:title" content="NYMA Reunion · May 14–16, 2027">
-<meta property="og:description" content="We're beating the bushes for lost NYMA cadets. Find yourself in the 2000, 2002 and 2004 Shrapnel, claim your card, RSVP. One year or four, you're welcome.">
+<meta property="og:description" content="We're beating the bushes for lost NYMA cadets. Find yourself in the 1979, 1980, 2000, 2002 and 2004 Shrapnel, claim your card, RSVP. One year or four, you're welcome.">
 <meta property="og:image" content="https://nyma2027.com/og.png">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta property="og:url" content="https://nyma2027.com/">
@@ -117,6 +117,16 @@ dialog::backdrop{background:rgba(5,9,18,.75)}
 .ccount .tot{background:var(--brass)}.ccount .tot b,.ccount .tot span{color:#0b1222}
 .bigdate{font-size:clamp(34px,6vw,64px);font-weight:800;letter-spacing:.02em;line-height:1;color:var(--brass);margin:2px 0 4px}
 .who{display:flex;gap:0;max-width:1200px;margin:22px auto 4px;padding:0 24px}
+.years{max-width:1200px;margin:10px auto 0;padding:0 24px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.years span{font-size:17px;color:var(--ink);margin-right:4px}
+.years button{font:inherit;font-size:19px;font-weight:700;padding:10px 18px;min-width:76px;border-radius:4px;border:2px solid var(--brass,#c8a95e);background:transparent;color:var(--ink);cursor:pointer}
+.years button[aria-pressed="true"]{background:var(--brass,#c8a95e);color:#141c2f}
+.feedbox{margin:22px 0 6px;text-align:left}
+.feedbox h3{margin:0 0 10px}
+#feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.fitem{display:flex;gap:10px;align-items:flex-start;text-align:left;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:4px;padding:10px;color:inherit;font:inherit;cursor:pointer}
+.fitem img,.fitem .ph0{width:48px;height:60px;object-fit:cover;flex:none;border:1px solid rgba(255,255,255,.2)}
+.fitem b{display:block;font-size:15px}.fitem q{display:block;margin:4px 0;font-style:italic;quotes:"\201C" "\201D"}.fitem small{opacity:.75}
 .who a{flex:1;text-align:center;padding:16px 12px;font-size:19px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;color:var(--ink);border:2px solid var(--brass);background:transparent}
 .who a:first-child{border-radius:6px 0 0 6px}.who a:last-child{border-radius:0 6px 6px 0;border-left:0}
 .who a[aria-selected="true"]{background:var(--brass);color:#0b1222}
@@ -222,6 +232,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
       <div><h3>Regiment of Graduates</h3><p>We're re-establishing the Regiment of Graduates. More information is coming soon.</p></div>
       <div><h3>Not in the yearbooks?</h3><p>You're still invited. RSVP with your name and class year and you'll go on the list of expected attendees.</p></div>
     </div>
+    <div class="feedbox" id="feedbox" hidden><h3>Latest on the walls</h3><div id="feed"></div></div>
     <div class="actions"><button class="btn pri big" data-rsvp="1">RSVP for May</button><a class="btn big" href="#coming">See who's coming</a><button class="btn big" data-focus="jump">Find yourself in the book</button><a class="btn big wa" href="https://chat.whatsapp.com/FUy64tbJuvyKAiCzV8Zml9" target="_blank" rel="noopener">Join the WhatsApp group</a></div>
   </div>
 </section>
@@ -234,7 +245,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
       <input id="jump" type="search" placeholder="Find a cadet or employee by name" autocomplete="off" aria-controls="jumpList" aria-expanded="false">
       <ul id="jumpList" role="listbox" hidden></ul>
     </div>
-    <p>Every cadet with a portrait in the 2000, 2002 and 2004 Shrapnel yearbooks is here, from the Class of 2000 through the Class of 2009. Cadets who appear in more than one book have one card with every year. Find yourself in the old photos, tell us you're coming, and help track down everyone else so they're there May 14–16.</p>
+    <p>Cadets and faculty from the 1979, 1980, 2000, 2002 and 2004 Shrapnel yearbooks are here, from the Class of 1979 through the Class of 2009. Cadets who appear in more than one book have one card with every year. Find yourself in the old photos, tell us you're coming, and help track down everyone else so they're there May 14–16.</p>
   </div>
   <div class="stats" aria-label="Progress">
     <div class="stat gold"><b id="sFound">0</b><span>of <span id="sTotal">270</span> found</span></div>
@@ -248,10 +259,14 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
     <a href="#wall" data-who="wall" role="tab">Cadets <small id="wCad">531</small></a>
     <a href="#faculty" data-who="faculty" role="tab">Faculty &amp; Staff <small id="wFac">138</small></a>
   </div>
+  <div class="years" id="years" role="group" aria-label="Browse by yearbook">
+    <span>Browse by yearbook:</span>
+    <button data-yr="" aria-pressed="true">All years</button><button data-yr="1979" aria-pressed="false">1979</button><button data-yr="1980" aria-pressed="false">1980</button><button data-yr="2000" aria-pressed="false">2000</button><button data-yr="2002" aria-pressed="false">2002</button><button data-yr="2004" aria-pressed="false">2004</button>
+  </div>
   <section id="v-wall" hidden>
     <div class="bar">
       <input id="q" type="search" placeholder="Search a name" aria-label="Search a name">
-      <select id="cls" aria-label="Class" class="chip"><option value="">All classes</option><option>2000</option><option>2001</option><option>2002</option><option>2003</option><option>2004</option><option>2005</option><option>2006</option><option>2007</option><option>2008</option><option>2009</option></select><select id="yb" aria-label="Yearbook" class="chip"><option value="">All yearbooks</option><option value="2000">2000 Shrapnel</option><option value="2002">2002 Shrapnel</option><option value="2004">2004 Shrapnel</option><option value="both">In more than one book</option></select>
+      <select id="cls" aria-label="Class" class="chip"><option value="">All classes</option><option>1979</option><option>1980</option><option>2000</option><option>2001</option><option>2002</option><option>2003</option><option>2004</option><option>2005</option><option>2006</option><option>2007</option><option>2008</option><option>2009</option></select><select id="yb" aria-label="Yearbook" class="chip"><option value="">All yearbooks</option><option value="1979">1979 Shrapnel</option><option value="1980">1980 Shrapnel</option><option value="2000">2000 Shrapnel</option><option value="2002">2002 Shrapnel</option><option value="2004">2004 Shrapnel</option><option value="both">In more than one book</option></select>
       <button class="chip" data-f="all" aria-pressed="true">Everyone</button>
       <button class="chip" data-f="found" aria-pressed="false">Found</button>
       <button class="chip" data-f="missing" aria-pressed="false">Still looking</button>
@@ -268,7 +283,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
       </div>
       <button class="chip" id="boxToggle" aria-pressed="true">Show face tags</button>
     </div>
-    <div class="bar" style="padding-top:0"><span class="note" style="margin:0">Yearbook:</span><button class="chip" data-book="2000" aria-pressed="false">2000 Shrapnel</button><button class="chip" data-book="2002" aria-pressed="false">2002 Shrapnel</button><button class="chip" data-book="2004" aria-pressed="false">2004 Shrapnel</button></div>
+    <div class="bar" style="padding-top:0"><span class="note" style="margin:0">Yearbook:</span><button class="chip" data-book="1979" aria-pressed="false">1979 Shrapnel</button><button class="chip" data-book="1980" aria-pressed="false">1980 Shrapnel</button><button class="chip" data-book="2000" aria-pressed="false">2000 Shrapnel</button><button class="chip" data-book="2002" aria-pressed="false">2002 Shrapnel</button><button class="chip" data-book="2004" aria-pressed="false">2004 Shrapnel</button></div>
     <div class="book">
       <div class="spread" id="spread"></div>
       <div class="strip" id="strip" aria-label="Pages"></div>
@@ -283,9 +298,9 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
 
   <section id="v-faculty" hidden>
     <div class="bar"><input id="fq" type="search" placeholder="Search faculty and staff" aria-label="Search faculty and staff">
-      <select id="fyb" aria-label="Yearbook" class="chip"><option value="">All yearbooks</option><option value="2000">2000 Shrapnel</option><option value="2002">2002 Shrapnel</option><option value="2004">2004 Shrapnel</option></select>
+      <select id="fyb" aria-label="Yearbook" class="chip"><option value="">All yearbooks</option><option value="1979">1979 Shrapnel</option><option value="1980">1980 Shrapnel</option><option value="2000">2000 Shrapnel</option><option value="2002">2002 Shrapnel</option><option value="2004">2004 Shrapnel</option></select>
       <button class="chip" id="fall" aria-pressed="true">Everyone</button><button class="chip" id="fmem" aria-pressed="false">In Memoriam <span id="fmemN"></span></button>
-      <p class="note" style="margin:0">The officers, teachers and staff who ran NYMA, from the 2000, 2002 and 2004 Shrapnel. Tap anyone to leave a note on their wall.</p></div>
+      <p class="note" style="margin:0">The officers, teachers and staff who ran NYMA, from the 1979, 1980, 2000, 2002 and 2004 Shrapnel. Tap anyone to leave a note on their wall.</p></div>
     <div id="facList"></div>
   </section>
 
@@ -299,15 +314,15 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
   <div>Reunion group chat: <a class="btn wa" href="https://chat.whatsapp.com/FUy64tbJuvyKAiCzV8Zml9" target="_blank" rel="noopener">Join the WhatsApp group</a></div>
   <div class="note" style="margin:0">Visits are counted anonymously: a random ID in your browser, no names or IP addresses.</div>
   <div>Want your name or photo removed from this site? <button class="btn" data-optout="">Request removal</button></div>
-  <div>Portraits and photos are from the 2000, 2002 and 2004 Shrapnel yearbooks.</div>
+  <div>Portraits and photos are from the 1979, 1980, 2000, 2002 and 2004 Shrapnel yearbooks.</div>
 </footer>
 
 <dialog id="dlg" aria-labelledby="pName"><div style="position:relative"><button class="x" id="dlgX" aria-label="Close">×</button><div class="card" id="card"></div></div></dialog>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="data.js?v=71bc6b8c"></script>
-<script src="notes.js?v=71bc6b8c"></script>
-<script src="attendees.js?v=71bc6b8c"></script>
+<script src="data.js?v=65865d23"></script>
+<script src="notes.js?v=65865d23"></script>
+<script src="attendees.js?v=65865d23"></script>
 <script>
 const ORGANIZER_EMAIL = 'nyma.reunion2027@gmail.com'; // reunion inbox: set before sharing
 const D = window.YB;
@@ -506,6 +521,8 @@ function bioHtml(p){
     parts.push(`${p.bio04||p.bio00?'<p class="note" style="margin:10px 0 4px">2002 Shrapnel senior bio</p>':''}` + dl([['College plans',b.college],['Sports',b.sports],['Ranks',b.ranks],['Favorite memory',b.memory],['Quote',b.quote]]) + (b.bioName?`<p class="note" style="margin:.5em 0 0">Bio printed as ${esc(b.bioName)}.</p>`:'')); }
   if (p.bio00) { const b = p.bio00;
     parts.push(`<p class="note" style="margin:${parts.length?'10px':'0'} 0 4px">2000 Shrapnel senior quote</p>` + dl([['Ranks',b.ranks],['Activities',b.activities],['Awards',b.awards],['Quote',b.quote]])); }
+  if (p.bioOld) { const b = p.bioOld;
+    parts.push(`<p class="note" style="margin:${parts.length?'10px':'0'} 0 4px">${esc(b.y)} Shrapnel senior page</p>` + dl([['Nickname',b.nick],['Rank',b.ranks],['Activities',b.activities],['Athletics',b.athletics],['Awards',b.awards]])); }
   if (parts.length) return parts.join('');
   const ys = p.yrs || [];
   if (p.staff) return `<p style="margin:0">NYMA ${esc(p.staff)}, pictured in the ${ys.map(y=>y.y).join(' and ')} Shrapnel.</p>`;
@@ -535,7 +552,7 @@ function openNote(id){
 function openRsvp(){
   delete dlg.dataset.id;
   document.getElementById('card').innerHTML = formShell(null, 'RSVP · Reunion May 14–16, 2027', 'Count me in',
-    'In the 2000, 2002 or 2004 yearbook? Find yourself with the search box and use "This is me" on your card instead, so your RSVP is tied to your photo.',
+    'In one of our yearbooks? Find yourself with the search box and use "This is me" on your card instead, so your RSVP is tied to your photo.',
     inp('r_first','First name',{ac:'given-name',val:ea((ME.name||'').split(' ')[0])}) + inp('r_last','Last name',{ac:'family-name',val:ea((ME.name||'').split(' ').slice(1).join(' '))}) + inp('r_cls','Class year (the year you graduated or would have)',{val:ea(ME.cls)}) +
     inp('r_years','Years you attended NYMA (optional)') + sel('r_rsvp','Coming May 14–16?',['Yes','Maybe']) + contactFields() +
     `<label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input id="r_pub" type="checkbox" checked style="width:auto"> Show my name and class year on the public list of expected attendees</label>`, 'Send RSVP');
@@ -636,7 +653,7 @@ async function loadApproved(){
   let rows;
   try { const r = await fetch(APPROVED_CSV + (APPROVED_CSV.includes('?')?'&':'?') + 't=' + Date.now()); rows = parseCSV(await r.text()).slice(1); }
   catch(e){ return; }
-  const notes = window.YB_NOTES = window.YB_NOTES || {}, att = window.YB_ATTENDEES = window.YB_ATTENDEES || [], removed = {};
+  const notes = window.YB_NOTES = window.YB_NOTES || {}, att = window.YB_ATTENDEES = window.YB_ATTENDEES || [], removed = {}, FEED = [];
   for (const [ts,type,id,name,cls,msg,det,pub] of rows){
     const t = (type||'').trim().toLowerCase(), n = parseFloat(ts), date = (!isNaN(n) && n > 40000) ? new Date(Math.round((n-25569)*86400000)).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'}) : (ts||'').split(' ')[0];
     if ((t==='tag' || t==='untag') && det) GTAG[det.trim()] = t==='tag' ? 'yes' : 'no';
@@ -644,7 +661,7 @@ async function loadApproved(){
     else if (t==='memorial' && byId[id]) { const d = kv(det), url = (d.Obituary||'').trim();
       let src = ''; try { src = url ? new URL(url).hostname.replace(/^www\./,'') : ''; } catch(e){}
       byId[id].mem = {years: d.Years || 'In memoriam', obit: url, src}; }
-    else if (t==='note' && byId[id] && msg) (notes[id] = notes[id] || []).push({from:name, cls, text:msg, date});
+    else if (t==='note' && byId[id] && msg) { (notes[id] = notes[id] || []).push({from:name, cls, text:msg, date}); FEED.push({id, from:name, cls, text:msg, date, n: isNaN(n)?0:n}); }
     else if (t==='claim' && byId[id]) { FOUND[id] = 1; const d = kv(det); NOW[id] = {...d, msg};
       if ((d.Coming||'').toLowerCase()!=='no') att.push({id, name:byId[id].name, cls:byId[id].cls, note:(d.Coming||'').toLowerCase()==='maybe'?'maybe':''}); }
     else if (t==='lead' && byId[id]) FOUND[id] = FOUND[id] || 'lead';
@@ -658,9 +675,16 @@ async function loadApproved(){
     D.people = D.people.filter(p => !removed[p.id]); D.faces = D.faces.filter(f => !removed[f.w]);
     Object.keys(removed).forEach(k => delete byId[k]);
   }
-  stats(); renderWall(); renderFind();
+  window.YB_FEED = FEED.filter(f => byId[f.id]).sort((a,b) => b.n - a.n);
+  stats(); renderWall(); renderFind(); renderFeed();
   if (!document.getElementById('v-coming').hidden) renderComing();
   if (dlg.open && dlg.dataset.id && byId[dlg.dataset.id] && !document.getElementById('f')) openCard(dlg.dataset.id);
+}
+function renderFeed(){
+  const F = (window.YB_FEED || []).slice(0, 6), box = document.getElementById('feedbox');
+  if (!box) return; box.hidden = !F.length; if (!F.length) return;
+  document.getElementById('feed').innerHTML = F.map(f => { const p = byId[f.id];
+    return `<button class="fitem tile-lite" data-id="${p.id}">${p.portrait?`<img src="${pic(p)}" alt="">`:'<span class="ph0"></span>'}<span><b>On ${esc(p.name)}'s wall</b><q>${esc(f.text.length>160?f.text.slice(0,157)+'…':f.text)}</q><small>${esc(f.from||'A classmate')}${f.cls?', Class of '+esc(f.cls):''}${f.date?' · '+esc(f.date):''}</small></span></button>`; }).join('');
 }
 function renderComing(){
   const A = window.YB_ATTENDEES || [];
@@ -678,6 +702,12 @@ function renderComing(){
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toast.h); toast.h=setTimeout(()=>t.classList.remove('on'),2200); }
 
 document.addEventListener('click', e => {
+  const yr = e.target.closest('[data-yr]'); if (yr) { const v = yr.dataset.yr;
+    document.querySelectorAll('[data-yr]').forEach(b => b.setAttribute('aria-pressed', b === yr));
+    const a = document.getElementById('yb'), b2 = document.getElementById('fyb'); if (a) a.value = v; if (b2) b2.value = v;
+    renderWall(); if (typeof renderFaculty === 'function') renderFaculty();
+    if (document.getElementById('v-wall').hidden && document.getElementById('v-faculty').hidden) location.hash = '#wall';
+    return; }
   const tl = e.target.closest('.tile, .tile-lite'); if (tl) return openCard(tl.dataset.id);
   const rv = e.target.closest('[data-rsvp]'); if (rv) return openRsvp();
   const cl = e.target.closest('[data-claim]'); if (cl) { dlg.dataset.id = cl.dataset.claim; return openForm(cl.dataset.claim, 'me'); }
@@ -730,7 +760,7 @@ jump.addEventListener('keydown', e => {
 });
 jl.addEventListener('click', e => { const li = e.target.closest('li[data-id]'); if (li) goTo(li.dataset.id); });
 document.addEventListener('click', e => { if (!e.target.closest('.find')) jl.hidden = true; });
-const DEPTS = ['Administration','Commandant’s Department','JROTC','Faculty','Admissions','Athletics','Business Office','Development','Technology','Communications','Facilities','Mess Hall','Infirmary','Cadet Store'];
+const DEPTS = ['Administration','Commandant’s Department','JROTC','Faculty','Library','Admissions','Athletics','Business Office','Development','Technology','Communications','Facilities','Mess Hall','Infirmary','Cadet Store'];
 function ftile(p){
   const img = p.portrait ? `<img src="${p.portrait}" alt="${esc(p.name)}" loading="lazy">` : `<div class="noimg">No photo in the book</div>`;
   const yrs = (p.yrs||[]).map(y=>'’'+y.y.slice(2)).join(' + ');
