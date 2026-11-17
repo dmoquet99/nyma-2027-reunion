@@ -123,6 +123,7 @@ dialog::backdrop{background:rgba(5,9,18,.75)}
 .years button{font:inherit;font-size:19px;font-weight:700;padding:10px 18px;min-width:76px;border-radius:4px;border:2px solid var(--brass,#c8a95e);background:transparent;color:var(--ink);cursor:pointer}
 .years button[aria-pressed="true"]{background:var(--brass,#c8a95e);color:#141c2f}
 .feedbox{margin:22px 0 6px;text-align:left}
+body:not([data-v="wall"]) .feedbox{display:none!important}
 .feedbox h3{margin:0 0 10px}
 #feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
 .fitem{display:flex;gap:10px;align-items:flex-start;text-align:left;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:4px;padding:10px;color:inherit;font:inherit;cursor:pointer}
@@ -781,6 +782,7 @@ function renderFaculty(){
   }).join('') || (D.people.some(p=>p.staff) ? '<p class="note">No one by that name.</p>' : '<p class="note">Loading the faculty list… If this stays empty, refresh the page.</p>');
 }
 function show(v){
+  document.body.dataset.v = v;
   ['wall','book','find','coming','faculty'].forEach(x => document.getElementById('v-'+x).hidden = x!==v);
   document.getElementById('hero').hidden = v==='book' || v==='coming';
   document.getElementById('who').hidden = !(v==='wall' || v==='faculty');
