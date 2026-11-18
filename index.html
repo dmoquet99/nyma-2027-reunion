@@ -157,6 +157,7 @@ h2.dept small{color:var(--muted);font-size:12px;letter-spacing:0}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 .x{position:absolute;right:10px;top:8px;background:none;border:none;color:var(--muted);font-size:26px;line-height:1}
 .note{font-size:13px;color:var(--muted);max-width:65ch}
+[hidden]{display:none!important}
 .form{display:grid;gap:10px}.form[hidden]{display:none}
 .form label{display:grid;gap:4px;font-size:14px;color:var(--muted)}
 .form input,.form textarea{background:#0d1528;border:1px solid #33405e;color:var(--ink);padding:9px 10px;font:inherit;border-radius:3px}
@@ -187,6 +188,19 @@ h2.dept small{color:var(--muted);font-size:12px;letter-spacing:0}
 .btn.big{padding:10px 18px;font-size:16px}
 .btn.wa{border-color:#25d366;color:#e9e4d8}.btn.wa::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:#25d366;margin-right:8px;vertical-align:1px}
 .wabox{margin-top:14px;padding:12px 14px;border:1px solid #25d366;border-radius:4px;background:rgba(37,211,102,.07)}.wabox p{margin:0 0 8px}
+.cfilt{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 16px}
+.cfilt span{font-size:15px;color:var(--muted);margin-right:2px}
+.ccount button{flex:1;min-width:120px;border:2px solid var(--brass);border-radius:6px;padding:12px 16px;text-align:center;background:transparent;color:inherit;font:inherit;cursor:pointer}
+.ccount button[aria-pressed="true"]{background:var(--brass)}.ccount button[aria-pressed="true"] b,.ccount button[aria-pressed="true"] span{color:#0b1222}
+.ccount b{display:block;font-size:40px;line-height:1;color:var(--brass)}
+.circle-intro{max-width:760px}.circle-intro p{font-size:17px;line-height:1.55}
+.tier{margin:26px 0 0}.tier h2{margin:0 0 4px}.tier>p{margin:0 0 12px;color:var(--muted)}
+.kc{display:flex;gap:12px;align-items:flex-start;background:var(--navy-2);border:1px solid #26324d;border-left:3px solid var(--brass);border-radius:4px;padding:10px;color:inherit;text-align:left;font:inherit;cursor:pointer;width:100%}
+.kc img,.kc .ph0{width:64px;height:80px;object-fit:cover;border-radius:2px;flex:none;background:#0d1528}
+.kc b{display:block;font-size:17px}.kc small{display:block;color:var(--muted)}.kc .offers{color:var(--brass);font-size:14px;margin-top:4px}.kc q{display:block;font-style:italic;margin-top:4px;font-size:14px}
+.kcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.kcbadge{border:1px solid var(--brass);border-radius:4px;padding:8px 10px;margin:0 0 10px}.kcbadge b{color:var(--brass)}
+.checks{display:grid;gap:6px}.checks label:not([for]){display:flex;gap:8px;align-items:center;font-weight:400}
 .coming{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
 .att{display:flex;gap:10px;align-items:center;background:var(--navy-2);border:1px solid #26324d;border-radius:4px;padding:8px;color:inherit;text-align:left}
 .att img,.att .ph0{width:44px;height:54px;object-fit:cover;border-radius:3px;background:#0d1528;flex:none}
@@ -215,10 +229,10 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
   <div class="mark">NYMA <span>’27</span></div>
   <nav aria-label="Sections">
     <a href="#wall" data-v="wall">The Wall</a>
-    <a href="#book" data-v="book">The Book</a>
+    <a href="#book" data-v="book">The Books</a>
     <a href="#coming" data-v="coming">Who's Coming</a>
-    <a href="#find" data-v="find">Help Find Them</a>
     <a href="#faculty" data-v="faculty">Faculty &amp; Staff</a>
+    <a href="#circle" data-v="circle">Knight's Circle</a>
   </nav>
   <div class="proto">NYMA Reunion · <b style="color:var(--brass)">May 14–16, 2027</b></div>
 </header>
@@ -296,6 +310,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
   <section id="v-coming" hidden>
     <div class="bar" style="justify-content:space-between"><p class="note" style="margin:0">Cadets who've told us they're coming May 14–16. New RSVPs show up here within a few minutes.</p><span class="actions"><a class="btn wa" href="https://chat.whatsapp.com/FUy64tbJuvyKAiCzV8Zml9" target="_blank" rel="noopener">Join the WhatsApp group</a><button class="btn pri" data-rsvp="1">Add me to the list</button></span></div>
     <div class="ccount" id="comingCount"></div>
+    <div class="cfilt" id="comingDec" role="group" aria-label="Filter by decade"></div>
     <div class="coming" id="comingList"></div>
   </section>
 
@@ -307,9 +322,14 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
     <div id="facList"></div>
   </section>
 
-  <section id="v-find" hidden>
-    <div class="bar"><p class="note" style="margin:0">These classmates haven't been found yet. Know where someone is? Open their card and tap <b>I know where they are</b>. If it's you, tap <b>This is me</b>.</p></div>
-    <div class="wall" id="findWall"></div>
+  <section id="v-circle" hidden>
+    <div class="circle-intro">
+      <h1 class="sub" style="margin-top:10px">The Knight's Circle</h1>
+      <p>NYMA graduates and former faculty who are giving back to the Academy: mentoring cadets, offering career advice and networking to fellow graduates, and lending their time, skills and services to NYMA.</p>
+      <div class="actions"><button class="btn pri big" data-circle="">Join the Knight's Circle</button></div>
+      <p class="note">Already have a card in the yearbooks? Open it and tap <b>Join the Knight's Circle</b> so your photo goes with your name.</p>
+    </div>
+    <div id="circleList"></div>
   </section>
 </main>
 <footer class="site">
@@ -367,7 +387,7 @@ function renderWall(){
   const list = D.people.filter(p => !p.staff && (!cl || p.cls===cl) && inYb(p) && (!q || p.name.toLowerCase().includes(q)) && (filter==='all' || (filter==='missing' && !p.mem && !FOUND[p.id]) || (filter==='found' && FOUND[p.id] && !p.mem) || (filter==='mem' && p.mem)));
   document.getElementById('wall').innerHTML = list.length ? list.map(tile).join('') : `<p class="note">${filter==='found' ? 'No one has been found yet. Once a classmate claims their entry or a lead is confirmed, they show up here with a current photo next to their yearbook portrait.' : 'No one by that name.'}</p>`;
 }
-function renderFind(){ document.getElementById('findWall').innerHTML = D.people.filter(p=>!p.staff && !p.mem && !FOUND[p.id]).map(tile).join(''); }
+function renderFind(){}
 
 /* Book */
 let curPage = D.pages[0], showBoxes = true;
@@ -408,8 +428,8 @@ function openCard(id){
       <div class="bio"><h3>Then</h3>${bioHtml(p)}</div>
       ${p.mem ? `<div><h3>In Memoriam</h3><p class="memline">${esc(p.mem.years)}</p>${p.mem.src?`<p class="note">Obituary: ${esc(p.mem.src)}</p>`:''}
         ${/^https?:\/\//.test(p.mem.obit||'')?`<div class="actions"><a class="btn pri" href="${esc(p.mem.obit)}" target="_blank" rel="noopener">Read obituary</a></div>`:''}</div>`
-      : `<div><h3>Now</h3>${nowHtml(id)}
-        <div class="actions"><button class="btn pri" data-act="me">This is me · I’m coming in May</button><button class="btn" data-act="lead">I know where they are</button></div></div>`}
+      : `<div><h3>Now</h3>${CIRCLE[id] ? `<div class="kcbadge"><b>Knight's Circle</b>${CIRCLE[id].offers?' · '+esc(CIRCLE[id].offers):''}</div>` : ''}${nowHtml(id)}
+        <div class="actions"><button class="btn pri" data-act="me">This is me · I’m coming in May</button><button class="btn" data-act="lead">I know where they are</button><button class="btn" data-circle="${p.id}">${CIRCLE[id] ? 'Update my Knight\'s Circle info' : 'Join the Knight\'s Circle'}</button></div></div>`}
     </div>
     <div class="sec"><h3>${p.mem ? 'Remembering' : 'Wall'} · <b>${notes.length}</b> note${notes.length===1?'':'s'}</h3>
       ${notes.length ? `<div class="wallnotes">${notes.map(n=>`<div class="wn"><p>${esc(n.text)}</p><div class="by">${esc(n.from)}${n.cls?', Class of '+esc(n.cls):''}${n.date?' · '+esc(n.date):''}</div></div>`).join('')}</div>` : `<p class="ph" style="margin:0 0 8px">No notes yet. ${p.mem ? 'Share a memory of '+esc(p.name.split(' ')[0])+'.' : 'Be the first to say hello before May.'}</p>`}
@@ -498,9 +518,9 @@ function openForm(id, kind){
   if (me) {
     document.getElementById('card').innerHTML = formShell(p, 'Claim your entry', p.name, 'Your city, work and link show on your card within a few minutes. Email and phone stay private. Add your email and we\'ll send you a daily summary when someone posts on your wall or on a wall you\'ve posted on.',
       sel('m_rsvp','Coming to the reunion, May 14–16, 2027?',['Yes','Maybe','No']) + inp('m_city','Where you live now') + inp('m_work','What you do') +
-      inp('m_link','Your LinkedIn, Facebook or other link') + inp('m_note','Anything for the class',{ta:1}) + contactFields(), 'Send it');
+      inp('m_link','Your LinkedIn, Facebook or other link') + inp('m_note','Anything for the class',{ta:1}) + circleFields() + contactFields(), 'Send it');
     bindForm(out => {
-      const det = [['Coming',g('m_rsvp')],['City',g('m_city')],['Work',g('m_work')],['Link',g('m_link')]].filter(x=>x[1]).map(x=>x.join(': ')).join('\n');
+      const det = [['Coming',g('m_rsvp')],['City',g('m_city')],['Work',g('m_work')],['Link',g('m_link')], ...circleDet()].filter(x=>x[1]).map(x=>x.join(': ')).join('\n');
       send({type:'claim', id:p.id, name:p.name, cls:p.cls, msg:g('m_note'), det, email:g('c_email'), phone:g('c_phone'), pub:'yes'},
         'Your card updates within a few minutes.' + (g('m_rsvp')!=='No' ? ' You\'ll also go on the Who\'s Coming list.' : ''));
     });
@@ -552,12 +572,63 @@ function openNote(id){
   });
   document.getElementById(ok ? (ME.name ? 'n_text' : 'n_from') : 'n_q').focus();
 }
+/* Knight's Circle: alumni and faculty giving back to NYMA */
+const CIRCLE = {}, CIRCLE_X = [];
+const OFFERS = ['Networking','Career advice and mentoring','Speaking to cadets','Professional services','Volunteering time'];
+// Echelons, highest first. Members default to 'service'. Pledge tiers get added here and assigned per person
+// with a "Tier:" line from the organizer; a tier with no members stays hidden.
+const TIERS = [
+  {key:'service', title:'Time and Talent', blurb:'Graduates and former faculty volunteering their time, expertise and services to NYMA.'}
+];
+const circleFields = () => `<fieldset class="checks" style="border:1px solid #33405e;border-radius:4px;padding:10px 12px;margin:0"><legend style="padding:0 6px;color:var(--brass)">Knight's Circle (optional)</legend>
+  <label><input id="k_in" type="checkbox" style="width:auto"> I'm willing to give back to NYMA and fellow graduates</label>
+  <div id="k_more" hidden style="display:grid;gap:6px;padding-left:4px">
+  <span class="note" style="margin:0">How you could help:</span>
+  ${OFFERS.map((o,i)=>`<label><input type="checkbox" class="k_off" value="${o}" style="width:auto"> ${o}</label>`).join('')}
+  ${inp('k_help','Anything more (your field, what you could offer)',{ta:1})}</div></fieldset>`;
+function circleDet(){
+  const box = document.getElementById('k_in'); if (!box || !box.checked) return [];
+  const offers = [...document.querySelectorAll('.k_off:checked')].map(b=>b.value).join(', ');
+  return [['Circle','Yes'],['Offers',offers],['Help',g('k_help').replace(/\n+/g,' ')]];
+}
+document.addEventListener('change', e => { if (e.target.id==='k_in') { const m=document.getElementById('k_more'); if (m) m.hidden = !e.target.checked; } });
+function openCircle(id){
+  const p = id && byId[id];
+  if (p) dlg.dataset.id = id; else delete dlg.dataset.id;
+  document.getElementById('card').innerHTML = formShell(p || null, "Knight's Circle", p ? p.name : "Join the Knight's Circle",
+    "Tell us how you'd be willing to give back: networking, career advice, mentoring cadets, your services, or your time. Your name, class and what you offer appear on the Knight's Circle page. Email and phone stay private.",
+    (p ? '' : inp('k_first','First name',{ac:'given-name',val:ea((ME.name||'').split(' ')[0])}) + inp('k_last','Last name',{ac:'family-name',val:ea((ME.name||'').split(' ').slice(1).join(' '))}) + inp('k_cls','Class year, or "Faculty"',{val:ea(ME.cls)})) +
+    circleFields() + contactFields(), 'Join the Circle');
+  const box = document.getElementById('k_in'); box.checked = true; document.getElementById('k_more').hidden = false;
+  box.closest('label').hidden = true; document.querySelector('#f legend').textContent = 'How you could help'; document.querySelector('#k_more > .note').hidden = true;
+  if (!dlg.open) dlg.showModal();
+  bindForm(out => {
+    const extra = circleDet(); if (!extra[1][1] && !extra[2][1]) { out.innerHTML = '<p class="note">Pick at least one way you could help, or describe it.</p>'; return; }
+    const det = extra.filter(x=>x[1]).map(x=>x.join(': ')).join('\n');
+    if (p) return send({type:'claim', id:p.id, name:p.name, cls:p.cls, det, email:g('c_email'), phone:g('c_phone'), pub:'yes'}, "You'll show up in the Knight's Circle within a few minutes. Thank you.");
+    const name = (g('k_first')+' '+g('k_last')).trim(); if (!name) { out.innerHTML = '<p class="note">Add your name.</p>'; return; }
+    const m = matchPerson(name, g('k_cls'));
+    if (m) return send({type:'claim', id:m.id, name:m.name, cls:m.cls, det, email:g('c_email'), phone:g('c_phone'), pub:'yes'}, "You'll show up in the Knight's Circle, with your yearbook photo, within a few minutes. Thank you.");
+    send({type:'rsvp', name, cls:g('k_cls'), det, email:g('c_email'), phone:g('c_phone'), pub:'yes'}, "You'll show up in the Knight's Circle within a few minutes. Thank you.");
+  });
+}
+function renderCircle(){
+  const M = [...Object.entries(CIRCLE).filter(([id])=>byId[id]).map(([id,c])=>({...c, p:byId[id]})), ...CIRCLE_X];
+  const el = document.getElementById('circleList');
+  if (!M.length) { el.innerHTML = '<p class="note" style="margin-top:20px">No members yet. Be the first.</p>'; return; }
+  el.innerHTML = TIERS.map(t => { const g2 = M.filter(m => (m.tier||'service')===t.key).sort((a,b)=>surname(a.p?a.p.name:a.name).localeCompare(surname(b.p?b.p.name:b.name)));
+    if (!g2.length) return '';
+    return `<div class="tier"><h2>${esc(t.title)} <small style="color:var(--muted);font-size:.6em">${g2.length}</small></h2><p>${esc(t.blurb)}</p><div class="kcgrid">${g2.map(m => { const p = m.p;
+      const img = p && p.portrait ? `<img src="${pic(p)}" alt="">` : '<span class="ph0"></span>';
+      const inner = `${img}<span><b>${esc(p?p.name:m.name)}</b><small>${p ? clsL(p) : (m.cls ? (/^\d{4}$/.test(m.cls)?'Class of '+esc(m.cls):esc(m.cls)) : '')}${m.work?' · '+esc(m.work):''}</small>${m.offers?`<span class="offers">${esc(m.offers)}</span>`:''}${m.help?`<q>${esc(m.help.length>180?m.help.slice(0,177)+'…':m.help)}</q>`:''}</span>`;
+      return p ? `<button class="kc tile-lite" data-id="${p.id}">${inner}</button>` : `<div class="kc">${inner}</div>`; }).join('')}</div></div>`; }).join('');
+}
 function openRsvp(){
   delete dlg.dataset.id;
   document.getElementById('card').innerHTML = formShell(null, 'RSVP · Reunion May 14–16, 2027', 'Count me in',
     'In one of our yearbooks? Find yourself with the search box and use "This is me" on your card instead, so your RSVP is tied to your photo.',
     inp('r_first','First name',{ac:'given-name',val:ea((ME.name||'').split(' ')[0])}) + inp('r_last','Last name',{ac:'family-name',val:ea((ME.name||'').split(' ').slice(1).join(' '))}) + inp('r_cls','Class year (the year you graduated or would have)',{val:ea(ME.cls)}) +
-    inp('r_years','Years you attended NYMA (optional)') + sel('r_rsvp','Coming May 14–16?',['Yes','Maybe']) + contactFields() +
+    inp('r_years','Years you attended NYMA (optional)') + sel('r_rsvp','Coming May 14–16?',['Yes','Maybe']) + circleFields() + contactFields() +
     `<label style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input id="r_pub" type="checkbox" checked style="width:auto"> Show my name and class year on the public list of expected attendees</label>`, 'Send RSVP');
   if (!dlg.open) dlg.showModal();
   const hint = document.createElement('div'); hint.id = 'r_hint'; document.getElementById('f').prepend(hint);
@@ -567,7 +638,7 @@ function openRsvp(){
   bindForm(out => {
     if (blank()) { out.innerHTML = '<p class="note">The form is empty.</p>'; return; }
     const pub = document.getElementById('r_pub').checked;
-    send({type:'rsvp', name:(g('r_first')+' '+g('r_last')).trim(), cls:g('r_cls'), det:`Coming: ${g('r_rsvp')}`+(g('r_years')?`\nYears attended: ${g('r_years')}`:''), email:g('c_email'), phone:g('c_phone'), pub: pub?'yes':'no'},
+    send({type:'rsvp', name:(g('r_first')+' '+g('r_last')).trim(), cls:g('r_cls'), det:[`Coming: ${g('r_rsvp')}`, g('r_years')?`Years attended: ${g('r_years')}`:'', ...circleDet().map(x=>x.join(': '))].filter(Boolean).join('\n'), email:g('c_email'), phone:g('c_phone'), pub: pub?'yes':'no'},
       pub ? 'Your name goes on the Who\'s Coming list within a few minutes.' : 'The organizer has your RSVP.');
   });
 }
@@ -657,6 +728,7 @@ async function loadApproved(){
   try { const r = await fetch(APPROVED_CSV + (APPROVED_CSV.includes('?')?'&':'?') + 't=' + Date.now()); rows = parseCSV(await r.text()).slice(1); }
   catch(e){ return; }
   const notes = window.YB_NOTES = window.YB_NOTES || {}, att = window.YB_ATTENDEES = window.YB_ATTENDEES || [], removed = {}, FEED = [];
+  Object.keys(CIRCLE).forEach(k => delete CIRCLE[k]); CIRCLE_X.length = 0;
   for (const [ts,type,id,name,cls,msg,det,pub] of rows){
     const t = (type||'').trim().toLowerCase(), n = parseFloat(ts), date = (!isNaN(n) && n > 40000) ? new Date(Math.round((n-25569)*86400000)).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'}) : (ts||'').split(' ')[0];
     if ((t==='tag' || t==='untag') && det) GTAG[det.trim()] = t==='tag' ? 'yes' : 'no';
@@ -665,14 +737,18 @@ async function loadApproved(){
       let src = ''; try { src = url ? new URL(url).hostname.replace(/^www\./,'') : ''; } catch(e){}
       byId[id].mem = {years: d.Years || 'In memoriam', obit: url, src}; }
     else if (t==='note' && byId[id] && msg) { (notes[id] = notes[id] || []).push({from:name, cls, text:msg, date}); FEED.push({id, from:name, cls, text:msg, date, n: isNaN(n)?0:n}); }
-    else if (t==='claim' && byId[id]) { FOUND[id] = 1; const d = kv(det); NOW[id] = {...d, msg};
-      if ((d.Coming||'').toLowerCase()!=='no') att.push({id, name:byId[id].name, cls:byId[id].cls, note:(d.Coming||'').toLowerCase()==='maybe'?'maybe':''}); }
+    else if (t==='claim' && byId[id]) { FOUND[id] = 1; const d = kv(det); const prev = NOW[id] || {};
+      NOW[id] = {...prev, ...Object.fromEntries(Object.entries(d).filter(x=>x[1])), msg: msg || prev.msg};
+      if ((d.Circle||'').toLowerCase()==='yes') CIRCLE[id] = {offers:d.Offers||'', help:d.Help||'', tier:(d.Tier||'').toLowerCase(), work:NOW[id].Work||''};
+      if (d.Coming) att.push({id, name:byId[id].name, cls:byId[id].cls, note:d.Coming.toLowerCase()==='maybe'?'maybe':d.Coming.toLowerCase()==='no'?'no':''}); }
     else if (t==='lead' && byId[id]) FOUND[id] = FOUND[id] || 'lead';
     else if (t==='rsvp' && name) { const d = kv(det), p = matchPerson(name, cls), note = (d.Coming||'').toLowerCase()==='maybe'?'maybe':'';
+      if ((d.Circle||'').toLowerCase()==='yes' && (pub||'').toLowerCase()==='yes') { if (p) { FOUND[p.id] = 1; CIRCLE[p.id] = {offers:d.Offers||'', help:d.Help||'', tier:(d.Tier||'').toLowerCase(), work:(NOW[p.id]||{}).Work||''}; } else CIRCLE_X.push({name, cls, offers:d.Offers||'', help:d.Help||'', tier:(d.Tier||'').toLowerCase()}); }
+      if (!d.Coming) continue;
       if (p) { FOUND[p.id] = 1; att.push({id:p.id, name:p.name, cls:p.cls, note}); }
       else if ((pub||'').toLowerCase()==='yes') att.push({name, cls, note}); }
   }
-  const seen = new Set(); window.YB_ATTENDEES = att.reverse().filter(a => { const k = a.id || ('n:'+norm(a.name)+a.cls); if (seen.has(k)) return false; seen.add(k); return true; });
+  const seen = new Set(); window.YB_ATTENDEES = att.reverse().filter(a => { const k = a.id || ('n:'+norm(a.name)+a.cls); if (seen.has(k)) return false; seen.add(k); return true; }).filter(a => a.note !== 'no');
   { const nl = document.querySelector('nav a[data-v="coming"]'); if (nl) nl.textContent = `Who's Coming (${window.YB_ATTENDEES.length})`; }
   if (Object.keys(removed).length){
     D.people = D.people.filter(p => !removed[p.id]); D.faces = D.faces.filter(f => !removed[f.w]);
@@ -681,6 +757,7 @@ async function loadApproved(){
   window.YB_FEED = FEED.filter(f => byId[f.id]).sort((a,b) => b.n - a.n);
   stats(); renderWall(); renderFind(); renderFeed();
   if (!document.getElementById('v-coming').hidden) renderComing();
+  if (!document.getElementById('v-circle').hidden) renderCircle();
   if (dlg.open && dlg.dataset.id && byId[dlg.dataset.id] && !document.getElementById('f')) openCard(dlg.dataset.id);
 }
 function renderFeed(){
@@ -689,14 +766,21 @@ function renderFeed(){
   document.getElementById('feed').innerHTML = F.map(f => { const p = byId[f.id];
     return `<button class="fitem tile-lite" data-id="${p.id}">${p.portrait?`<img src="${pic(p)}" alt="">`:'<span class="ph0"></span>'}<span><b>On ${esc(p.name)}'s wall</b><q>${esc(f.text.length>160?f.text.slice(0,157)+'…':f.text)}</q><small>${esc(f.from||'A classmate')}${f.cls?', Class of '+esc(f.cls):''}${f.date?' · '+esc(f.date):''}</small></span></button>`; }).join('');
 }
+let CF = 'all', CDEC = '';
+const decOf = c => /^\d{4}$/.test(String(c||'').trim()) ? String(Math.floor(+c/10)*10) : '';
 function renderComing(){
   const A = window.YB_ATTENDEES || [];
   const el = document.getElementById('comingList');
   const may = A.filter(a=>a.note==='maybe').length, yes = A.length - may;
-  document.getElementById('comingCount').innerHTML = `<div><b>${yes}</b><span>Coming</span></div><div><b>${may}</b><span>Maybe</span></div><div class="tot"><b>${A.length}</b><span>Total RSVPs</span></div>`;
+  const btn = (k,n,l,cls) => `<button data-cf="${k}" aria-pressed="${CF===k}"${cls?` class="${cls}"`:''}><b>${n}</b><span>${l}</span></button>`;
+  document.getElementById('comingCount').innerHTML = btn('yes',yes,'Coming') + btn('maybe',may,'Maybe') + btn('all',A.length,'All RSVPs');
+  const decs = [...new Set(A.map(a=>decOf(a.cls)).filter(Boolean))].sort();
+  document.getElementById('comingDec').innerHTML = decs.length > 1 ? `<span>Decade:</span><button class="chip" data-dec="" aria-pressed="${!CDEC}">All</button>` + decs.map(d=>`<button class="chip" data-dec="${d}" aria-pressed="${CDEC===d}">Class of ${d}s</button>`).join('') : '';
   const nl = document.querySelector('nav a[data-v="coming"]'); if (nl) nl.textContent = `Who's Coming (${A.length})`;
   if (!A.length) { el.innerHTML = '<p class="note">No confirmed RSVPs yet. Be the first on the list.</p>'; return; }
-  const sorted = [...A].sort((a,b)=> (a.cls||'').localeCompare(b.cls||'') || surname(a.name).localeCompare(surname(b.name)));
+  const list = A.filter(a => (CF==='all' || (CF==='maybe' ? a.note==='maybe' : a.note!=='maybe')) && (!CDEC || decOf(a.cls)===CDEC));
+  if (!list.length) { el.innerHTML = '<p class="note">No one matches that filter yet.</p>'; return; }
+  const sorted = [...list].sort((a,b)=> (a.cls||'').localeCompare(b.cls||'') || surname(a.name).localeCompare(surname(b.name)));
   el.innerHTML = sorted.map(a => { const p = a.id && byId[a.id];
     const img = p && p.portrait ? `<img src="${pic(p)}" alt="">` : '<span class="ph0"></span>';
     return p ? `<button class="att tile-lite" data-id="${p.id}">${img}<span>${esc(p.name)}<small>Class of ${p.cls}${a.note?' · '+esc(a.note):''}</small></span></button>`
@@ -711,6 +795,9 @@ document.addEventListener('click', e => {
     renderWall(); if (typeof renderFaculty === 'function') renderFaculty();
     if (document.getElementById('v-wall').hidden && document.getElementById('v-faculty').hidden) location.hash = '#wall';
     return; }
+  const kcb = e.target.closest('[data-circle]'); if (kcb) return openCircle(kcb.dataset.circle);
+  const cfb = e.target.closest('[data-cf]'); if (cfb) { CF = cfb.dataset.cf; return renderComing(); }
+  const dcb = e.target.closest('[data-dec]'); if (dcb) { CDEC = dcb.dataset.dec; return renderComing(); }
   const tl = e.target.closest('.tile, .tile-lite'); if (tl) return openCard(tl.dataset.id);
   const rv = e.target.closest('[data-rsvp]'); if (rv) return openRsvp();
   const cl = e.target.closest('[data-claim]'); if (cl) { dlg.dataset.id = cl.dataset.claim; return openForm(cl.dataset.claim, 'me'); }
@@ -783,13 +870,14 @@ function renderFaculty(){
 }
 function show(v){
   document.body.dataset.v = v;
-  ['wall','book','find','coming','faculty'].forEach(x => document.getElementById('v-'+x).hidden = x!==v);
-  document.getElementById('hero').hidden = v==='book' || v==='coming';
+  ['wall','book','coming','faculty','circle'].forEach(x => document.getElementById('v-'+x).hidden = x!==v);
+  document.getElementById('hero').hidden = v==='book' || v==='coming' || v==='circle';
   document.getElementById('who').hidden = !(v==='wall' || v==='faculty');
   document.getElementById('years').hidden = !(v==='wall' || v==='faculty');
   document.querySelectorAll('[data-who]').forEach(a => a.setAttribute('aria-selected', a.dataset.who===v));
-  document.getElementById('splash').hidden = v==='book';
+  document.getElementById('splash').hidden = v!=='wall';
   if (v==='coming') renderComing();
+  if (v==='circle') renderCircle();
   if (v==='faculty') renderFaculty();
   document.querySelectorAll('nav a').forEach(a => a.toggleAttribute('aria-current', a.dataset.v===v) || a.dataset.v===v && a.setAttribute('aria-current','page'));
   document.querySelectorAll('nav a').forEach(a => { if (a.dataset.v===v) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
@@ -798,7 +886,7 @@ function show(v){
 function route(){
   const h = decodeURIComponent(location.hash.slice(1));
   if (byId[h]) { show('wall'); openCard(h); return; }
-  show(['wall','book','find','coming','faculty'].includes(h) ? h : 'wall');
+  show(['wall','book','coming','faculty','circle'].includes(h) ? h : 'wall');
 }
 window.addEventListener('hashchange', route);
 function turnPage(d){
