@@ -176,7 +176,11 @@ h2.dept small{color:var(--muted);font-size:12px;letter-spacing:0}
 .wn{background:#0d1528;border-left:3px solid var(--brass);padding:10px 12px;border-radius:0 4px 4px 0}
 .wn p{margin:0 0 4px;white-space:pre-wrap}
 .wn .by{font-size:13px;color:var(--muted)}
-.splash{background:linear-gradient(180deg,#1c2a47,var(--navy));border-bottom:3px solid var(--brass)}
+.splash{position:relative;background:var(--navy);border-bottom:3px solid var(--brass);overflow:hidden}
+.splash::before{content:"";position:absolute;left:0;right:0;top:0;height:min(720px,62vw);min-height:460px;background:url(img/barracks.jpg) center 30%/cover no-repeat;filter:sepia(.15)}
+.splash::after{content:"";position:absolute;left:0;right:0;top:0;height:min(720px,62vw);min-height:460px;background:linear-gradient(90deg,rgba(14,22,40,.88) 0%,rgba(14,22,40,.6) 48%,rgba(14,22,40,.18) 100%),linear-gradient(180deg,rgba(14,22,40,.25) 0%,rgba(14,22,40,0) 40%,var(--navy) 100%)}
+.splash-in{position:relative;z-index:1}
+.splash h2,.splash .bigdate,.splash .kicker,.splash .lead{text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .splash-in{max-width:1200px;margin:0 auto;padding:40px 24px 34px;display:grid;gap:16px}
 .kicker{font-family:var(--display);font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--brass);font-size:15px}
 .splash h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(38px,6.4vw,78px);line-height:.95;margin:0;max-width:16ch;text-wrap:balance}
