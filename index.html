@@ -380,7 +380,7 @@ function tile(p){
   const status = p.mem ? 'In memoriam' : FOUND[p.id] ? 'Found' : 'Not found yet';
   const img = p.portrait ? `<img src="${pic(p)}" alt="${esc(p.name)}, yearbook portrait" loading="lazy">` : `<div class="noimg">Photo not available in the book</div>`;
   return `<button class="tile${p.mem?' mem':''}" data-id="${p.id}">${img}
-    <div class="cap"><span class="rk">${p.rank ? p.rank+' · ' : ''}${clsL(p)}${(p.yrs||[]).length>1?' · <span class="ybadge">’02 + ’04</span>':''}</span><span class="nm">${esc(p.name)}</span>
+    <div class="cap"><span class="rk">${p.rank ? p.rank+' · ' : ''}${clsL(p)}${(p.yrs||[]).length>1?` · <span class="ybadge">${p.yrs.map(y=>'’'+y.y.slice(2)).join(' + ')}</span>`:''}</span><span class="nm">${esc(p.name)}</span>
     <span class="meta"><span>In ${n} photo${n===1?'':'s'}${((window.YB_NOTES||{})[p.id]||[]).length?' · '+(window.YB_NOTES[p.id].length)+' notes':''}</span><span class="dot${FOUND[p.id]&&!p.mem?' found':''}">${status}</span></span></div></button>`;
 }
 let filter='all';
