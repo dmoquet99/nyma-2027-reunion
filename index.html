@@ -252,7 +252,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
       <div><h3>Regiment of Graduates</h3><p>We're re-establishing the Regiment of Graduates. More information is coming soon.</p></div>
       <div><h3>Not in the yearbooks?</h3><p>You're still invited. RSVP with your name and class year and you'll go on the list of expected attendees.</p></div>
     </div>
-    <div class="feedbox" id="feedbox" hidden><h3>Latest on the walls</h3><div id="feed"></div></div>
+    <div class="feedbox" id="feedbox" hidden><h3>Just claimed their cards</h3><div id="feed"></div></div>
     <div class="actions"><button class="btn pri big" data-rsvp="1">RSVP for May</button><a class="btn big" href="#coming">See who's coming</a><button class="btn big" data-focus="jump">Find yourself in the book</button><a class="btn big wa" href="https://chat.whatsapp.com/FUy64tbJuvyKAiCzV8Zml9" target="_blank" rel="noopener">Join the WhatsApp group</a></div>
   </div>
 </section>
@@ -742,8 +742,10 @@ async function loadApproved(){
     else if (t==='memorial' && byId[id]) { const d = kv(det), url = (d.Obituary||'').trim();
       let src = ''; try { src = url ? new URL(url).hostname.replace(/^www\./,'') : ''; } catch(e){}
       byId[id].mem = {years: d.Years || 'In memoriam', obit: url, src}; }
-    else if (t==='note' && byId[id] && msg) { (notes[id] = notes[id] || []).push({from:name, cls, text:msg, date}); FEED.push({id, from:name, cls, text:msg, date, n: isNaN(n)?0:n}); }
+    else if (t==='note' && byId[id] && msg) { (notes[id] = notes[id] || []).push({from:name, cls, text:msg, date}); }
     else if (t==='claim' && byId[id]) { FOUND[id] = 1; const d = kv(det); const prev = NOW[id] || {};
+      if (!d.Circle || d.Coming || msg) { const f = FEED.find(x=>x.id===id); const nn = isNaN(n)?0:n;
+        if (f) { f.n = Math.max(f.n, nn); if (msg) f.text = msg; f.date = date; } else FEED.push({id, text:msg||'', date, n:nn}); }
       NOW[id] = {...prev, ...Object.fromEntries(Object.entries(d).filter(x=>x[1])), msg: msg || prev.msg};
       if ((d.Circle||'').toLowerCase()==='yes') CIRCLE[id] = {offers:d.Offers||'', help:d.Help||'', tier:(d.Tier||'').toLowerCase(), work:NOW[id].Work||''};
       if (d.Coming) att.push({id, name:byId[id].name, cls:byId[id].cls, note:d.Coming.toLowerCase()==='maybe'?'maybe':d.Coming.toLowerCase()==='no'?'no':''}); }
@@ -770,7 +772,9 @@ function renderFeed(){
   const F = (window.YB_FEED || []).slice(0, 6), box = document.getElementById('feedbox');
   if (!box) return; box.hidden = !F.length; if (!F.length) return;
   document.getElementById('feed').innerHTML = F.map(f => { const p = byId[f.id];
-    return `<button class="fitem tile-lite" data-id="${p.id}">${p.portrait?`<img src="${pic(p)}" alt="">`:'<span class="ph0"></span>'}<span><b>On ${esc(p.name)}'s wall</b><q>${esc(f.text.length>160?f.text.slice(0,157)+'…':f.text)}</q><small>${esc(f.from||'A classmate')}${f.cls?', Class of '+esc(f.cls):''}${f.date?' · '+esc(f.date):''}</small></span></button>`; }).join('');
+    const now = NOW[p.id] || {}, c = (now.Coming||'').toLowerCase();
+    const line = [now.City, now.Work].filter(Boolean).map(esc).join(' · ');
+    return `<button class="fitem tile-lite" data-id="${p.id}">${p.portrait?`<img src="${pic(p)}" alt="">`:'<span class="ph0"></span>'}<span><b>${esc(p.name)}</b><small>${p.staff?'Faculty & Staff':'Class of '+esc(p.cls)}${c==='yes'?' · Coming in May':c==='maybe'?' · Maybe in May':''}</small>${f.text?`<q>${esc(f.text.length>160?f.text.slice(0,157)+'…':f.text)}</q>`:''}${line?`<small style="display:block">${line}</small>`:''}</span></button>`; }).join('');
 }
 let CF = 'all', CDEC = '';
 const decOf = c => /^\d{4}$/.test(String(c||'').trim()) ? String(Math.floor(+c/10)*10) : '';
