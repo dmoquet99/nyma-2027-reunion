@@ -433,7 +433,7 @@ function openCard(id){
       ${p.mem ? `<div><h3>In Memoriam</h3><p class="memline">${esc(p.mem.years)}</p>${p.mem.src?`<p class="note">Obituary: ${esc(p.mem.src)}</p>`:''}
         ${/^https?:\/\//.test(p.mem.obit||'')?`<div class="actions"><a class="btn pri" href="${esc(p.mem.obit)}" target="_blank" rel="noopener">Read obituary</a></div>`:''}</div>`
       : `<div><h3>Now</h3>${CIRCLE[id] ? `<div class="kcbadge"><b>Knight's Circle</b>${CIRCLE[id].offers?' · '+esc(CIRCLE[id].offers):''}</div>` : ''}${nowHtml(id)}
-        <div class="actions"><button class="btn pri" data-act="me">This is me · I’m coming in May</button><button class="btn" data-act="lead">I know where they are</button><button class="btn" data-circle="${p.id}">${CIRCLE[id] ? 'Update my Knight\'s Circle info' : 'Join the Knight\'s Circle'}</button></div></div>`}
+        <div class="actions"><button class="btn pri" data-act="me">This is me</button><button class="btn" data-act="lead">I know where they are</button><button class="btn" data-circle="${p.id}">${CIRCLE[id] ? 'Update my Knight\'s Circle info' : 'Join the Knight\'s Circle'}</button></div></div>`}
     </div>
     <div class="sec"><h3>${p.mem ? 'Remembering' : 'Wall'} · <b>${notes.length}</b> note${notes.length===1?'':'s'}</h3>
       ${notes.length ? `<div class="wallnotes">${notes.map(n=>`<div class="wn"><p>${esc(n.text)}</p><div class="by">${esc(n.from)}${n.cls?', Class of '+esc(n.cls):''}${n.date?' · '+esc(n.date):''}</div></div>`).join('')}</div>` : `<p class="ph" style="margin:0 0 8px">No notes yet. ${p.mem ? 'Share a memory of '+esc(p.name.split(' ')[0])+'.' : 'Be the first to say hello before May.'}</p>`}
@@ -521,12 +521,12 @@ function openForm(id, kind){
   const p = byId[id], me = kind==='me';
   if (me) {
     document.getElementById('card').innerHTML = formShell(p, 'Claim your entry', p.name, 'Your city, work and link show on your card within a few minutes. Email and phone stay private. Add your email and we\'ll send you a daily summary when someone posts on your wall or on a wall you\'ve posted on.',
-      sel('m_rsvp','Coming to the reunion, May 14–16, 2027?',['Yes','Maybe','No']) + inp('m_city','Where you live now') + inp('m_work','What you do') +
+      sel('m_rsvp','Coming to the reunion, May 14–16, 2027? (optional)',['Not sure yet','Yes','Maybe','No']) + inp('m_city','Where you live now') + inp('m_work','What you do') +
       inp('m_link','Your LinkedIn, Facebook or other link') + inp('m_note','Anything for the class',{ta:1}) + circleFields() + contactFields(), 'Send it');
     bindForm(out => {
-      const det = [['Coming',g('m_rsvp')],['City',g('m_city')],['Work',g('m_work')],['Link',g('m_link')], ...circleDet()].filter(x=>x[1]).map(x=>x.join(': ')).join('\n');
+      const det = [['Coming',g('m_rsvp')==='Not sure yet'?'':g('m_rsvp')],['City',g('m_city')],['Work',g('m_work')],['Link',g('m_link')], ...circleDet()].filter(x=>x[1]).map(x=>x.join(': ')).join('\n');
       send({type:'claim', id:p.id, name:p.name, cls:p.cls, msg:g('m_note'), det, email:g('c_email'), phone:g('c_phone'), pub:'yes'},
-        'Your card updates within a few minutes.' + (g('m_rsvp')!=='No' ? ' You\'ll also go on the Who\'s Coming list.' : ''));
+        'Your card updates within a few minutes.' + (['Yes','Maybe'].includes(g('m_rsvp')) ? ' You\'ll also go on the Who\'s Coming list.' : ''));
     });
   } else {
     document.getElementById('card').innerHTML = formShell(p, 'Send a lead', p.name, 'Leads go only to the organizer. Nothing you write here is posted.',
