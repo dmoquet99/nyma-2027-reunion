@@ -423,7 +423,7 @@ const dlg = document.getElementById('dlg');
 function openCard(id){
   const p = byId[id], t = tagged(id), m = maybes(id), notes = (window.YB_NOTES||{})[id] || [];
   document.getElementById('card').innerHTML = `
-  <div class="left">${p.portrait ? `<img id="mainPort" src="${pic(p)}" alt="${esc(p.name)}, yearbook portrait" data-port="${p.id}" title="See this page in the yearbook" style="cursor:pointer">` : '<div class="noimg">Photo not available in the book</div>'}
+  <div class="left">${p.portrait ? `<img id="mainPort" src="${pic(p)}" alt="${esc(p.name)}, yearbook portrait" data-port="${p.id}" data-pg="${((p.yrs||[]).find(y=>y.img===p.portrait)||{}).page||''}" title="See this page in the yearbook" style="cursor:pointer">` : '<div class="noimg">Photo not available in the book</div>'}
     <div class="note" id="mainCap">${portCap(p, (p.yrs||[]).find(y=>y.img===p.portrait))}</div>
     ${timelineHtml(p)}</div>
   <div class="right">
@@ -461,8 +461,8 @@ function portCap(p, y){
 function timelineHtml(p){
   const ys = p.yrs || [];
   if (!ys.length) return '';
-  return `<div class="tl"><h3>In the yearbooks</h3>${ys.map(y => `<button class="tl-row${y.img===p.portrait?' on':''}" data-port="${y.img}" data-cap="${esc(portCap(p,y))}" ${y.img?'':'disabled'}>
-      ${y.img?`<img src="${y.img}" alt="">`:'<span class="ph0"></span>'}<span><b>${y.y} Shrapnel</b><small>${y.cls==='staff'?'Staff':y.cls===y.y?'Senior':'Class of '+y.cls}${y.rank?' · '+esc(y.rank):''}</small><small>Spread ${y.page}</small></span></button>`).join('')}
+  return `<div class="tl"><h3>In the yearbooks</h3>${ys.map(y => `<button class="tl-row${y.img===p.portrait?' on':''}" data-port="${y.img}" data-pg="${y.page}" data-cap="${esc(portCap(p,y))}" ${y.img?'':'disabled'}>
+      ${y.img?`<img src="${y.img}" alt="" data-go="${p.id}|${y.page}" title="Open the ${y.y} Shrapnel to this page">`:'<span class="ph0"></span>'}<span><b>${y.y} Shrapnel</b><small>${y.cls==='staff'?'Staff':y.cls===y.y?'Senior':'Class of '+y.cls}${y.rank?' · '+esc(y.rank):''}</small><small>Spread ${y.page}</small></span></button>`).join('')}
     ${ys.length>1?'<p class="note" style="margin:0">Tap a year to see that portrait.</p>':''}</div>`;
 }
 let composed = '';
@@ -817,11 +817,12 @@ document.addEventListener('click', e => {
   const hot = e.target.closest('.hot'); if (hot) return openCard(hot.dataset.id);
   const th = e.target.closest('.th'); if (th) { dlg.close(); return gotoFace(th.dataset.pg, th.dataset.k); }
   const sb = e.target.closest('#strip button'); if (sb) { curPage = sb.dataset.pg; return renderSpread(); }
-  const tr = e.target.closest('.tl-row'); if (tr && tr.dataset.port) { document.getElementById('mainPort').src = tr.dataset.port; document.getElementById('mainCap').textContent = tr.dataset.cap; document.querySelectorAll('.tl-row').forEach(r=>r.classList.toggle('on', r===tr)); return; }
+  const go = e.target.closest('[data-go]'); if (go) { const [id,pg]=go.dataset.go.split('|'); const f = D.faces.find(f=>f.w===id && f.s==='ref' && f.pg===pg); dlg.close(); return f ? gotoFace(f.pg, fk(f)) : gotoFace(pg); }
+  const tr = e.target.closest('.tl-row'); if (tr && tr.dataset.port) { document.getElementById('mainPort').src = tr.dataset.port; document.getElementById('mainPort').dataset.pg = tr.dataset.pg; document.getElementById('mainCap').textContent = tr.dataset.cap; document.querySelectorAll('.tl-row').forEach(r=>r.classList.toggle('on', r===tr)); return; }
   const bkb = e.target.closest('[data-book]'); if (bkb) { const b = D.books.find(x=>x.y===bkb.dataset.book); curPage = b.start || b.pages[0]; return renderSpread(); }
   const y = e.target.closest('[data-yes]'), n = e.target.closest('[data-no]');
   if (y || n) { const k=(y||n).dataset.yes || (y||n).dataset.no; confirms[k] = y ? 'yes':'no'; store.set(confirms); const tp = byId[dlg.dataset.id]; submitEntry({type: y ? 'tag' : 'untag', id: dlg.dataset.id, name: tp ? tp.name : '', cls: tp ? tp.cls : '', det: k, msg: (y ? 'Confirmed photo on spread ' : 'Rejected photo on spread ') + k.split(':')[0], pub:'no'}).catch(()=>{}); stats(); renderWall(); renderFind(); if(!document.getElementById('v-book').hidden) renderSpread(); openCard(dlg.dataset.id); toast(y ? 'Thanks. Tag sent for approval.' : 'Thanks. Sent for review.'); return; }
-  const port = e.target.closest('[data-port]'); if (port) { const p = byId[port.dataset.port], y = (p.yrs||[]).find(y=>y.img===p.portrait) || {}; const f = D.faces.find(f=>f.w===p.id && f.s==='ref' && f.pg===y.page) || D.faces.find(f=>f.w===p.id && f.s==='ref'); if (f) { dlg.close(); return gotoFace(f.pg, fk(f)); } if (y.page) { dlg.close(); return gotoFace(y.page); } return; }
+  const port = e.target.closest('[data-port]'); if (port) { const p = byId[port.dataset.port], y = (p.yrs||[]).find(y=>y.page===port.dataset.pg) || (p.yrs||[]).find(y=>y.img===p.portrait) || {}; const f = D.faces.find(f=>f.w===p.id && f.s==='ref' && f.pg===y.page) || D.faces.find(f=>f.w===p.id && f.s==='ref'); if (f) { dlg.close(); return gotoFace(f.pg, fk(f)); } if (y.page) { dlg.close(); return gotoFace(y.page); } return; }
   const see = e.target.closest('[data-see]'); if (see) { const [pg,k]=see.dataset.see.split('|'); dlg.close(); return gotoFace(pg,k); }
   const act = e.target.closest('[data-act]'); if (act) return openForm(dlg.dataset.id, act.dataset.act);
   const cp = e.target.closest('[data-copy]'); if (cp) { const txt = cp.dataset.copy==='addr' ? ORGANIZER_EMAIL : composed; navigator.clipboard.writeText(txt).then(()=>toast('Copied'), ()=>toast('Select the text and copy it manually')); return; }
