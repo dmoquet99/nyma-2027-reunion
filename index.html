@@ -347,9 +347,9 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
 <dialog id="dlg" aria-labelledby="pName"><div style="position:relative"><button class="x" id="dlgX" aria-label="Close">×</button><div class="card" id="card"></div></div></dialog>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="data.js?v=efff8eb1"></script>
-<script src="notes.js?v=efff8eb1"></script>
-<script src="attendees.js?v=efff8eb1"></script>
+<script src="data.js?v=d8327b66"></script>
+<script src="notes.js?v=d8327b66"></script>
+<script src="attendees.js?v=d8327b66"></script>
 <script>
 const ORGANIZER_EMAIL = 'nyma.reunion2027@gmail.com'; // reunion inbox: set before sharing
 const D = window.YB;
@@ -423,7 +423,7 @@ const dlg = document.getElementById('dlg');
 function openCard(id){
   const p = byId[id], t = tagged(id), m = maybes(id), notes = (window.YB_NOTES||{})[id] || [];
   document.getElementById('card').innerHTML = `
-  <div class="left">${p.portrait ? `<img id="mainPort" src="${pic(p)}" alt="${esc(p.name)}, yearbook portrait">` : '<div class="noimg">Photo not available in the book</div>'}
+  <div class="left">${p.portrait ? `<img id="mainPort" src="${pic(p)}" alt="${esc(p.name)}, yearbook portrait" data-port="${p.id}" title="See this page in the yearbook" style="cursor:pointer">` : '<div class="noimg">Photo not available in the book</div>'}
     <div class="note" id="mainCap">${portCap(p, (p.yrs||[]).find(y=>y.img===p.portrait))}</div>
     ${timelineHtml(p)}</div>
   <div class="right">
@@ -551,7 +551,7 @@ function bioHtml(p){
   if (p.bio00) { const b = p.bio00;
     parts.push(`<p class="note" style="margin:${parts.length?'10px':'0'} 0 4px">2000 Shrapnel senior quote</p>` + dl([['Ranks',b.ranks],['Activities',b.activities],['Awards',b.awards],['Quote',b.quote]])); }
   if (p.bioOld) { const b = p.bioOld;
-    parts.push(`<p class="note" style="margin:${parts.length?'10px':'0'} 0 4px">${esc(b.y)} Shrapnel senior page</p>` + dl([['Nickname',b.nick],['Rank',b.ranks],['Activities',b.activities],['Athletics',b.athletics],['Awards',b.awards]])); }
+    parts.push(`<p class="note" style="margin:${parts.length?'10px':'0'} 0 4px">${esc(b.y)} Shrapnel senior page</p>` + dl([['Nickname',b.nick],['Rank',b.ranks],['Activities',b.activities],['Athletics',b.athletics],['Awards',b.awards],['Senior memory',b.memory]])); }
   if (parts.length) return parts.join('');
   const ys = p.yrs || [];
   if (p.staff) return `<p style="margin:0">NYMA ${esc(p.staff)}, pictured in the ${ys.map(y=>y.y).join(' and ')} Shrapnel.</p>`;
@@ -821,6 +821,7 @@ document.addEventListener('click', e => {
   const bkb = e.target.closest('[data-book]'); if (bkb) { const b = D.books.find(x=>x.y===bkb.dataset.book); curPage = b.start || b.pages[0]; return renderSpread(); }
   const y = e.target.closest('[data-yes]'), n = e.target.closest('[data-no]');
   if (y || n) { const k=(y||n).dataset.yes || (y||n).dataset.no; confirms[k] = y ? 'yes':'no'; store.set(confirms); const tp = byId[dlg.dataset.id]; submitEntry({type: y ? 'tag' : 'untag', id: dlg.dataset.id, name: tp ? tp.name : '', cls: tp ? tp.cls : '', det: k, msg: (y ? 'Confirmed photo on spread ' : 'Rejected photo on spread ') + k.split(':')[0], pub:'no'}).catch(()=>{}); stats(); renderWall(); renderFind(); if(!document.getElementById('v-book').hidden) renderSpread(); openCard(dlg.dataset.id); toast(y ? 'Thanks. Tag sent for approval.' : 'Thanks. Sent for review.'); return; }
+  const port = e.target.closest('[data-port]'); if (port) { const p = byId[port.dataset.port], y = (p.yrs||[]).find(y=>y.img===p.portrait) || {}; const f = D.faces.find(f=>f.w===p.id && f.s==='ref' && f.pg===y.page) || D.faces.find(f=>f.w===p.id && f.s==='ref'); if (f) { dlg.close(); return gotoFace(f.pg, fk(f)); } if (y.page) { dlg.close(); return gotoFace(y.page); } return; }
   const see = e.target.closest('[data-see]'); if (see) { const [pg,k]=see.dataset.see.split('|'); dlg.close(); return gotoFace(pg,k); }
   const act = e.target.closest('[data-act]'); if (act) return openForm(dlg.dataset.id, act.dataset.act);
   const cp = e.target.closest('[data-copy]'); if (cp) { const txt = cp.dataset.copy==='addr' ? ORGANIZER_EMAIL : composed; navigator.clipboard.writeText(txt).then(()=>toast('Copied'), ()=>toast('Select the text and copy it manually')); return; }
