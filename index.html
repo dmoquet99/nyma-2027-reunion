@@ -86,6 +86,11 @@ select.chip{background:var(--navy-2);color:var(--ink)}
 .hot.maybe{border-color:rgba(224,178,92,.7);border-style:dashed}
 .hot:hover{background:rgba(212,166,74,.18)}
 .hot.flash{border-color:#fff;box-shadow:0 0 0 4px rgba(212,166,74,.6)}
+.txtmark{position:absolute;border:3px solid #d4a64a;background:rgba(212,166,74,.28);border-radius:3px;pointer-events:none;animation:tm 1.6s ease-in-out 3}
+@keyframes tm{50%{box-shadow:0 0 0 8px rgba(212,166,74,.45)}}
+.ments{display:grid;gap:6px}.mn{display:block;width:100%;text-align:left;background:none;border:1px solid rgba(127,127,127,.3);border-radius:6px;padding:8px 10px;cursor:pointer;color:inherit;font:inherit}
+.bio01msg{font-size:.88em;line-height:1.45;margin:6px 0 0;max-height:12em;overflow:auto;padding-right:4px;opacity:.92}
+.mn:hover{border-color:#d4a64a}.mn small{display:block;opacity:.7;font-size:.8em;margin-bottom:2px}.mn span{font-size:.9em;line-height:1.35}.mn mark{background:rgba(212,166,74,.45);color:inherit;padding:0 2px}
 .hot .lbl{position:absolute;left:50%;top:100%;transform:translate(-50%,4px);white-space:nowrap;background:var(--navy);color:var(--ink);font:600 12px/1.2 var(--body);padding:3px 6px;border-radius:3px;border:1px solid var(--brass-dim);opacity:0;pointer-events:none}
 .hot:hover .lbl,.hot:focus-visible .lbl{opacity:1}
 .hideboxes .hot{border-color:transparent!important}
@@ -281,12 +286,12 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
   </div>
   <div class="years" id="years" role="group" aria-label="Browse by yearbook">
     <span>Browse by yearbook:</span>
-    <button data-yr="" aria-pressed="true">All years</button><button data-yr="1965" aria-pressed="false">1965</button><button data-yr="1979" aria-pressed="false">1979</button><button data-yr="1980" aria-pressed="false">1980</button><button data-yr="1990" aria-pressed="false">1990</button><button data-yr="2000" aria-pressed="false">2000</button><button data-yr="2002" aria-pressed="false">2002</button><button data-yr="2003" aria-pressed="false">2003</button><button data-yr="2004" aria-pressed="false">2004</button>
+    <button data-yr="" aria-pressed="true">All years</button><button data-yr="1965" aria-pressed="false">1965</button><button data-yr="1979" aria-pressed="false">1979</button><button data-yr="1980" aria-pressed="false">1980</button><button data-yr="1990" aria-pressed="false">1990</button><button data-yr="2000" aria-pressed="false">2000</button><button data-yr="2001" aria-pressed="false">2001</button><button data-yr="2002" aria-pressed="false">2002</button><button data-yr="2003" aria-pressed="false">2003</button><button data-yr="2004" aria-pressed="false">2004</button>
   </div>
   <section id="v-wall" hidden>
     <div class="bar">
       <input id="q" type="search" placeholder="Search a name" aria-label="Search a name">
-      <select id="cls" aria-label="Class" class="chip"><option value="">All classes</option><option>1965</option><option>1979</option><option>1980</option><option>1990</option><option>1991</option><option>1992</option><option>1993</option><option>1994</option><option>1995</option><option>1996</option><option>2000</option><option>2001</option><option>2002</option><option>2003</option><option>2004</option><option>2005</option><option>2006</option><option>2007</option><option>2008</option><option>2009</option></select><select id="yb" aria-label="Yearbook" class="chip"><option value="">All yearbooks</option><option value="1965">1965 Shrapnel</option><option value="1979">1979 Shrapnel</option><option value="1980">1980 Shrapnel</option><option value="1990">1990 Shrapnel</option><option value="2000">2000 Shrapnel</option><option value="2002">2002 Shrapnel</option><option value="2003">2003 Shrapnel</option><option value="2004">2004 Shrapnel</option><option value="both">In more than one book</option></select>
+      <select id="cls" aria-label="Class" class="chip"><option value="">All classes</option><option>1965</option><option>1979</option><option>1980</option><option>1990</option><option>1991</option><option>1992</option><option>1993</option><option>1994</option><option>1995</option><option>1996</option><option>2000</option><option>2001</option><option>2002</option><option>2003</option><option>2004</option><option>2005</option><option>2006</option><option>2007</option><option>2008</option><option>2009</option></select><select id="yb" aria-label="Yearbook" class="chip"><option value="">All yearbooks</option><option value="1965">1965 Shrapnel</option><option value="1979">1979 Shrapnel</option><option value="1980">1980 Shrapnel</option><option value="1990">1990 Shrapnel</option><option value="2000">2000 Shrapnel</option><option value="2001">2001 Shrapnel</option><option value="2002">2002 Shrapnel</option><option value="2003">2003 Shrapnel</option><option value="2004">2004 Shrapnel</option><option value="both">In more than one book</option></select>
       <button class="chip" data-f="all" aria-pressed="true">Everyone</button>
       <button class="chip" data-f="found" aria-pressed="false">Found</button>
       <button class="chip" data-f="missing" aria-pressed="false">Still looking</button>
@@ -304,7 +309,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
       </div>
       <button class="chip" id="boxToggle" aria-pressed="true">Show face tags</button>
     </div>
-    <div class="bar" style="padding-top:0"><span class="note" style="margin:0">Yearbook:</span><button class="chip" data-book="1965" aria-pressed="false">1965 Shrapnel</button><button class="chip" data-book="1979" aria-pressed="false">1979 Shrapnel</button><button class="chip" data-book="1980" aria-pressed="false">1980 Shrapnel</button><button class="chip" data-book="1990" aria-pressed="false">1990 Shrapnel</button><button class="chip" data-book="2000" aria-pressed="false">2000 Shrapnel</button><button class="chip" data-book="2002" aria-pressed="false">2002 Shrapnel</button><button class="chip" data-book="2003" aria-pressed="false">2003 Shrapnel</button><button class="chip" data-book="2004" aria-pressed="false">2004 Shrapnel</button></div>
+    <div class="bar" style="padding-top:0"><span class="note" style="margin:0">Yearbook:</span><button class="chip" data-book="1965" aria-pressed="false">1965 Shrapnel</button><button class="chip" data-book="1979" aria-pressed="false">1979 Shrapnel</button><button class="chip" data-book="1980" aria-pressed="false">1980 Shrapnel</button><button class="chip" data-book="1990" aria-pressed="false">1990 Shrapnel</button><button class="chip" data-book="2000" aria-pressed="false">2000 Shrapnel</button><button class="chip" data-book="2001" aria-pressed="false">2001 Shrapnel</button><button class="chip" data-book="2002" aria-pressed="false">2002 Shrapnel</button><button class="chip" data-book="2003" aria-pressed="false">2003 Shrapnel</button><button class="chip" data-book="2004" aria-pressed="false">2004 Shrapnel</button></div>
     <div class="book">
       <div class="spread" id="spread"></div>
       <div class="strip" id="strip" aria-label="Pages"></div>
@@ -320,7 +325,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
 
   <section id="v-faculty" hidden>
     <div class="bar"><input id="fq" type="search" placeholder="Search faculty and staff" aria-label="Search faculty and staff">
-      <select id="fyb" aria-label="Yearbook" class="chip"><option value="">All yearbooks</option><option value="1965">1965 Shrapnel</option><option value="1979">1979 Shrapnel</option><option value="1980">1980 Shrapnel</option><option value="1990">1990 Shrapnel</option><option value="2000">2000 Shrapnel</option><option value="2002">2002 Shrapnel</option><option value="2003">2003 Shrapnel</option><option value="2004">2004 Shrapnel</option></select>
+      <select id="fyb" aria-label="Yearbook" class="chip"><option value="">All yearbooks</option><option value="1965">1965 Shrapnel</option><option value="1979">1979 Shrapnel</option><option value="1980">1980 Shrapnel</option><option value="1990">1990 Shrapnel</option><option value="2000">2000 Shrapnel</option><option value="2001">2001 Shrapnel</option><option value="2002">2002 Shrapnel</option><option value="2003">2003 Shrapnel</option><option value="2004">2004 Shrapnel</option></select>
       <button class="chip" id="fall" aria-pressed="true">Everyone</button><button class="chip" id="fmem" aria-pressed="false">In Memoriam <span id="fmemN"></span></button>
       <p class="note" style="margin:0">The officers, teachers and staff who ran NYMA. Tap anyone to leave a note on their wall.</p></div>
     <div id="facList"></div>
@@ -347,9 +352,9 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
 <dialog id="dlg" aria-labelledby="pName"><div style="position:relative"><button class="x" id="dlgX" aria-label="Close">×</button><div class="card" id="card"></div></div></dialog>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="data.js?v=efa461ee"></script>
-<script src="notes.js?v=efa461ee"></script>
-<script src="attendees.js?v=efa461ee"></script>
+<script src="data.js?v=c48fd815"></script>
+<script src="notes.js?v=c48fd815"></script>
+<script src="attendees.js?v=c48fd815"></script>
 <script>
 const ORGANIZER_EMAIL = 'nyma.reunion2027@gmail.com'; // reunion inbox: set before sharing
 const D = window.YB;
@@ -413,8 +418,16 @@ function renderSpread(flashKey){
     const lab = st==='maybe' ? `Is this ${p.name}?` : p.name;
     return `<button class="hot ${st}${fk(f)===flashKey?' flash':''}" style="left:${f.r[0]*100}%;top:${f.r[1]*100}%;width:${f.r[2]*100}%;height:${f.r[3]*100}%" data-id="${p.id}" data-k="${fk(f)}" aria-label="${esc(lab)}"><span class="lbl">${esc(lab)}</span></button>`;
   }).join('');
+  if (pendingMark && pendingMark.pg===curPage) { const r=pendingMark.r, m=document.createElement('div'); m.className='txtmark'; m.style.cssText=`left:${r[0]*100}%;top:${r[1]*100}%;width:${r[2]*100}%;height:${r[3]*100}%`; el.appendChild(m); setTimeout(()=>m.scrollIntoView({block:'center'}),60); } else pendingMark=null;
   renderStrip();
   const cur = document.querySelector('#strip [aria-current="true"]'); if (cur) cur.scrollIntoView({block:'nearest',inline:'center'});
+}
+let pendingMark=null;
+function gotoText(pg, r){ curPage = pg; pendingMark = {pg, r}; location.hash = 'book'; show('book'); renderSpread(); }
+function mentHtml(id){
+  const ms=(D.mentions||{})[id]||[]; if(!ms.length) return '';
+  const hl=(c,w)=>{ const e=esc(c); const ww=esc(w).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); return ww? e.replace(new RegExp('\\b('+ww+')\\b','i'),'<mark>$1</mark>') : e; };
+  return `<div class="sec"><h3>Mentioned in the yearbook · <b>${ms.length}</b></h3><div class="ments">${ms.map((m,i)=>`<button class="mn" data-mi="${i}"><small>${bookOf(m.pg)} Shrapnel · spread ${m.pg}</small><span>…${hl(m.c,m.w)}…</span></button>`).join('')}</div><p class="note" style="margin:6px 0 0">Found by reading the yearbook text. Tap one to see it on the page.</p></div>`;
 }
 function gotoFace(pg, key){ curPage = pg; location.hash = 'book'; show('book'); renderSpread(key); const h=document.querySelector('.hot.flash'); if(h) h.scrollIntoView({block:'center'}); }
 
@@ -442,6 +455,7 @@ function openCard(id){
     <div class="sec"><h3>Appears in <b>${t.length}</b> photo${t.length===1?'':'s'}</h3>
       ${t.length ? `<div class="thumbs">${t.map(f=>`<div style="position:relative"><button class="th" data-pg="${f.pg}" data-k="${fk(f)}" aria-label="Open spread ${f.pg}" style="width:100%"><img src="${f.t}" alt=""><small>p. ${f.pg}</small></button><button class="notme" data-no="${fk(f)}" title="Not ${esc(p.name.split(' ')[0])}" aria-label="Not ${esc(p.name)}">×</button></div>`).join('')}</div><p class="note" style="margin:6px 0 0">Wrong person in a photo? Tap the × on it.</p>` : '<p class="ph">No confident matches.</p>'}
     </div>
+    ${mentHtml(id)}
     ${m.length ? `<div class="sec"><h3>Help confirm · <b>${m.length}</b> possible</h3><div style="display:grid;gap:8px">
       ${m.map(f=>`<div class="maybe-row" data-k="${fk(f)}"><img src="${f.t}" alt=""><div class="q">Is this ${esc(p.name.split(' ')[0])}? <span class="note">Spread ${f.pg} · similarity ${f.sim.toFixed(2)}</span></div>
         <div class="yn"><button class="btn pri" data-yes="${fk(f)}">Yes</button><button class="btn" data-no="${fk(f)}">No</button><button class="btn" data-see="${f.pg}|${fk(f)}">See</button></div></div>`).join('')}
@@ -550,6 +564,8 @@ function bioHtml(p){
     parts.push(`${p.bio04||p.bio00||p.bio03?'<p class="note" style="margin:10px 0 4px">2002 Shrapnel senior bio</p>':''}` + dl([['College plans',b.college],['Sports',b.sports],['Ranks',b.ranks],['Favorite memory',b.memory],['Quote',b.quote]]) + (b.bioName?`<p class="note" style="margin:.5em 0 0">Bio printed as ${esc(b.bioName)}.</p>`:'')); }
   if (p.bio00) { const b = p.bio00;
     parts.push(`<p class="note" style="margin:${parts.length?'10px':'0'} 0 4px">2000 Shrapnel senior quote</p>` + dl([['Ranks',b.ranks],['Activities',b.activities],['Awards',b.awards],['Quote',b.quote]])); }
+  if (p.bio01) { const b = p.bio01;
+    parts.push(`<p class="note" style="margin:${parts.length?'10px':'0'} 0 4px">2001 Shrapnel senior page</p>` + dl([['Rank',b.rank],['Quote',b.quote]]) + (b.msg?`<div class="bio01msg">${esc(b.msg).replace(/\n/g,'<br>')}</div>`:'')); }
   if (p.bioOld) { const b = p.bioOld;
     parts.push(`<p class="note" style="margin:${parts.length?'10px':'0'} 0 4px">${esc(b.y)} Shrapnel senior page</p>` + dl([['Nickname',b.nick],['Hometown',b.home],['Entered NYMA',b.entered],['Rank',b.ranks],['Activities',b.activities],['Athletics',b.athletics],['Awards',b.awards],['Senior memory',b.memory]])); }
   if (parts.length) return parts.join('');
@@ -815,6 +831,7 @@ document.addEventListener('click', e => {
   const mm = e.target.closest('[data-memorial]'); if (mm) return openMemorial(mm.dataset.memorial);
   const fc = e.target.closest('[data-focus]'); if (fc) { const j = document.getElementById(fc.dataset.focus); j.scrollIntoView({block:'center'}); return j.focus(); }
   const hot = e.target.closest('.hot'); if (hot) return openCard(hot.dataset.id);
+  const mn = e.target.closest('.mn'); if (mn) { const m=(D.mentions||{})[dlg.dataset.id][+mn.dataset.mi]; dlg.close(); return gotoText(m.pg, m.r); }
   const th = e.target.closest('.th'); if (th) { dlg.close(); return gotoFace(th.dataset.pg, th.dataset.k); }
   const sb = e.target.closest('#strip button'); if (sb) { curPage = sb.dataset.pg; return renderSpread(); }
   const go = e.target.closest('[data-go]'); if (go) { const [id,pg]=go.dataset.go.split('|'); const f = D.faces.find(f=>f.w===id && f.s==='ref' && f.pg===pg); dlg.close(); return f ? gotoFace(f.pg, fk(f)) : gotoFace(pg); }
