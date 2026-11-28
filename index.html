@@ -347,7 +347,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
     <div class="bar" style="justify-content:space-between"><p class="note" style="margin:0">Where NYMA cadets and faculty are now. Every pin is someone who claimed their card and told us their city. Claim yours to add your pin.</p></div>
     <div class="ccount" id="globeCount"></div>
     <div id="globeBox" style="position:relative;width:100%;height:min(72vh,640px,110vw);border-radius:6px;overflow:hidden;background:#05080f"></div>
-    <p class="note" style="margin:6px 0 0;font-size:12px;opacity:.6">Map © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a></p>
+    <p class="note" style="margin:6px 0 0;font-size:12px;opacity:.6">Imagery © Esri, Maxar, Earthstar Geographics, and the GIS User Community</p>
     <div id="globeList" class="globe-list"></div>
   </section>
 </main>
@@ -974,7 +974,7 @@ async function renderGlobe(){
     el.addEventListener('click',()=>{ if(g.people.length===1) location.hash=g.people[0].id; else { const c=[...list.children].find(c=>c.querySelector('b').textContent===g.place); if(c){ c.scrollIntoView({behavior:'smooth',block:'center'}); c.style.outline='2px solid var(--brass)'; setTimeout(()=>c.style.outline='',2000);} } });
     return el; };
   if(!NGLOBE){
-    NGLOBE=new Globe(box,{animateIn:true}).globeTileEngineUrl((x,y,l)=>`https://${'abcd'[(x+y)%4]}.basemaps.cartocdn.com/dark_all/${l}/${x}/${y}@2x.png`).globeTileEngineMaxLevel(17).backgroundColor('#05080f')
+    NGLOBE=new Globe(box,{animateIn:true}).globeTileEngineUrl((x,y,l)=>`https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${l}/${y}/${x}`).globeTileEngineMaxLevel(18).backgroundColor('#05080f')
       .atmosphereColor('#d4a64a').atmosphereAltitude(0.16)
       .htmlElement(pinEl).htmlAltitude(0.01).htmlElementVisibilityModifier((el,v)=>{ el.style.opacity=v?1:0; el.style.pointerEvents=v?'auto':'none'; })
       .arcStartLat(()=>HQ.lat).arcStartLng(()=>HQ.lng).arcEndLat(g=>g.lat).arcEndLng(g=>g.lng)
