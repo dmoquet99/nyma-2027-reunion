@@ -976,7 +976,7 @@ async function renderGlobe(){
   if(!NGLOBE){
     NGLOBE=new Globe(box,{animateIn:true}).globeTileEngineUrl((x,y,l)=>`https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${l}/${y}/${x}`).globeTileEngineMaxLevel(18).backgroundColor('#05080f')
       .atmosphereColor('#d4a64a').atmosphereAltitude(0.16)
-      .htmlElement(pinEl).htmlAltitude(0.01).htmlElementVisibilityModifier((el,v)=>{ el.style.opacity=v?1:0; el.style.pointerEvents=v?'auto':'none'; })
+      .htmlElement(pinEl).htmlAltitude(0).htmlElementVisibilityModifier((el,v)=>{ el.style.opacity=v?1:0; el.style.pointerEvents=v?'auto':'none'; })
       .arcStartLat(()=>HQ.lat).arcStartLng(()=>HQ.lng).arcEndLat(g=>g.lat).arcEndLng(g=>g.lng)
       .arcColor(()=>['rgba(212,166,74,0.45)','rgba(212,166,74,0.05)']).arcStroke(null).arcAltitudeAutoScale(0.3)
       .arcDashLength(0.2).arcDashGap(0.8).arcDashInitialGap(()=>Math.random()).arcDashAnimateTime(7000)
