@@ -977,7 +977,7 @@ async function renderGlobe(){
       .atmosphereColor('#d4a64a').atmosphereAltitude(0.16)
       .htmlElement(pinEl).htmlAltitude(0.01).htmlElementVisibilityModifier((el,v)=>{ el.style.opacity=v?1:0; el.style.pointerEvents=v?'auto':'none'; })
       .arcStartLat(()=>HQ.lat).arcStartLng(()=>HQ.lng).arcEndLat(g=>g.lat).arcEndLng(g=>g.lng)
-      .arcColor(()=>['rgba(212,166,74,0.9)','rgba(212,166,74,0.15)']).arcStroke(0.35).arcAltitudeAutoScale(0.45)
+      .arcColor(()=>['rgba(212,166,74,0.9)','rgba(212,166,74,0.15)']).arcStroke(0.12).arcAltitudeAutoScale(0.45)
       .arcDashLength(0.35).arcDashGap(0.65).arcDashInitialGap(()=>Math.random()).arcDashAnimateTime(2600)
       .ringLat(g=>g.lat).ringLng(g=>g.lng).ringColor(()=>t=>`rgba(212,166,74,${0.7*(1-t)})`).ringMaxRadius(2.2).ringPropagationSpeed(1.2).ringRepeatPeriod(2200);
     NGLOBE.controls().autoRotate=true; NGLOBE.controls().autoRotateSpeed=0.45;
