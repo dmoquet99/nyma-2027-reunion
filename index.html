@@ -928,15 +928,29 @@ function show(v){
 const US_ST={AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',DC:'District of Columbia',PR:'Puerto Rico'};
 let NGLOBE=null, NGLOBE_LOADING=null;
 function gstore(k,v){ try{ if(v===undefined) return JSON.parse(localStorage.getItem(k)||'null'); localStorage.setItem(k,JSON.stringify(v)); }catch(e){ return null; } }
+const ST_C={AL:[32.8,-86.8],AK:[61.2,-149.9],AZ:[34.3,-111.7],AR:[34.9,-92.4],CA:[37.2,-119.5],CO:[39.0,-105.5],CT:[41.6,-72.7],DE:[39.0,-75.5],FL:[28.6,-82.4],GA:[32.7,-83.4],HI:[20.8,-156.3],ID:[44.4,-114.6],IL:[40.0,-89.2],IN:[39.9,-86.3],IA:[42.1,-93.5],KS:[38.5,-98.4],KY:[37.5,-85.3],LA:[31.1,-92.0],ME:[45.4,-69.2],MD:[39.0,-76.8],MA:[42.3,-71.8],MI:[44.3,-85.4],MN:[46.3,-94.3],MS:[32.7,-89.7],MO:[38.4,-92.5],MT:[47.0,-109.6],NE:[41.5,-99.8],NV:[39.3,-116.6],NH:[43.7,-71.6],NJ:[40.2,-74.7],NM:[34.4,-106.1],NY:[42.9,-75.5],NC:[35.6,-79.4],ND:[47.5,-100.5],OH:[40.3,-82.8],OK:[35.6,-97.5],OR:[43.9,-120.6],PA:[40.9,-77.8],RI:[41.7,-71.5],SC:[33.9,-80.9],SD:[44.4,-100.2],TN:[35.9,-86.4],TX:[31.5,-99.3],UT:[39.3,-111.7],VT:[44.1,-72.7],VA:[37.5,-78.9],WA:[47.4,-120.5],WV:[38.6,-80.6],WI:[44.6,-89.9],WY:[43.0,-107.6],DC:[38.9,-77.0],PR:[18.2,-66.5]};
+function stateOf(t){ t=String(t||'').replace(/\./g,'').trim(); const u=t.toUpperCase(); if(US_ST[u]) return u; const l=t.toLowerCase(); return Object.keys(US_ST).find(k=>US_ST[k].toLowerCase()===l)||null; }
+function parseCity(raw){
+  let s=String(raw).replace(/\./g,'').replace(/\s+/g,' ').trim().replace(/\bLong Is\b/i,'Long Island').replace(/^LIC\b/i,'Long Island City').replace(/^NYC$/i,'New York');
+  let parts=s.split(',').map(t=>t.trim()).filter(Boolean);
+  if(parts.length===1){ const w=parts[0].split(' ');
+    for(const n of [2,1]) if(w.length>n && stateOf(w.slice(-n).join(' '))){ parts=[w.slice(0,-n).join(' '),w.slice(-n).join(' ')]; break; } }
+  return parts;
+}
+const stPin=st=>({lat:ST_C[st][0],lng:ST_C[st][1],place:US_ST[st]+', United States'});
 async function geocode(city){
-  const key='geo1:'+city.toLowerCase().trim(), hit=gstore(key); if (hit) return hit.lat==null?null:hit;
-  const parts=city.split(',').map(x=>x.trim()).filter(Boolean); if(!parts.length) return null;
-  const hint=parts.slice(1).join(' ').replace(/\./g,'').trim(), hintU=hint.toUpperCase(), full=(US_ST[hintU]||hint).toLowerCase();
+  const key='geo2:'+city.toLowerCase().trim(), hit=gstore(key); if (hit) return hit.lat==null?null:hit;
+  const parts=parseCity(city); if(!parts.length) return null;
+  const save=o=>{ gstore(key,o||{lat:null}); return o; };
+  // a bare state ("Florida", "CT", "NY") goes to the middle of that state; "New York" alone means the city
+  if(parts.length===1 && parts[0].toLowerCase()!=='new york'){ const st=stateOf(parts[0]); if(st) return save(stPin(st)); }
+  const st=parts.length>1?stateOf(parts[parts.length-1]):null, hint=parts.slice(1).join(' ').toLowerCase();
   let res=[]; try{ const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?count=10&language=en&format=json&name='+encodeURIComponent(parts[0])); res=(await r.json()).results||[]; }catch(e){ return null; }
-  const score=x=>{ let s=Math.log10((x.population||1)+1); if(full){ const a=[x.admin1,x.country,x.country_code].join(' ').toLowerCase(); if(a.includes(full)) s+=20; if(hintU.length===2 && x.country_code===hintU) s+=15; if(US_ST[hintU] && x.country_code==='US') s+=5; } return s; };
-  res.sort((a,b)=>score(b)-score(a)); const b=res[0];
-  const out=b?{lat:b.latitude,lng:b.longitude,place:[b.name,b.admin1,b.country].filter(Boolean).join(', ')}:{lat:null};
-  gstore(key,out); return b?out:null;
+  if(st){ res=res.filter(x=>x.country_code==='US' && (x.admin1||'').toLowerCase()===US_ST[st].toLowerCase()); if(!res.length) return save(stPin(st)); }
+  else if(hint){ const m=res.filter(x=>[x.admin1,x.country,x.country_code].join(' ').toLowerCase().includes(hint) || (hint==='uk' && x.country_code==='GB') || (hint==='korea' && x.country_code==='KR')); if(m.length) res=m; }
+  res.sort((a,b)=>(b.population||0)-(a.population||0)); const b=res[0]; if(!b) return save(null);
+  const place=[...new Set([b.name,b.admin1,b.country].filter(Boolean))].join(', ');
+  return save({lat:b.latitude,lng:b.longitude,place});
 }
 function loadGlobeLib(){ return NGLOBE_LOADING || (NGLOBE_LOADING=new Promise((ok,no)=>{ const sc=document.createElement('script'); sc.src='vendor/globe.gl.min.js'; sc.onload=ok; sc.onerror=no; document.head.appendChild(sc); })); }
 async function renderGlobe(){
