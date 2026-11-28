@@ -937,9 +937,9 @@ function parseCity(raw){
     for(const n of [2,1]) if(w.length>n && stateOf(w.slice(-n).join(' '))){ parts=[w.slice(0,-n).join(' '),w.slice(-n).join(' ')]; break; } }
   return parts;
 }
-const stPin=st=>({lat:ST_C[st][0],lng:ST_C[st][1],place:US_ST[st]+', United States'});
+const stPin=st=>({lat:ST_C[st][0],lng:ST_C[st][1],place:US_ST[st]+' (town not given)'});
 async function geocode(city){
-  const key='geo2:'+city.toLowerCase().trim(), hit=gstore(key); if (hit) return hit.lat==null?null:hit;
+  const key='geo3:'+city.toLowerCase().trim(), hit=gstore(key); if (hit) return hit.lat==null?null:hit;
   const parts=parseCity(city); if(!parts.length) return null;
   const save=o=>{ gstore(key,o||{lat:null}); return o; };
   // a bare state ("Florida", "CT", "NY") goes to the middle of that state; "New York" alone means the city
