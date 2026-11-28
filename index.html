@@ -960,7 +960,7 @@ async function renderGlobe(){
   const pts=(await Promise.all(ppl.map(async p=>({...p,g:await geocode(p.city)})))).filter(p=>p.g);
   const groups={}; pts.forEach(p=>{ const k=p.g.lat.toFixed(2)+','+p.g.lng.toFixed(2); (groups[k]=groups[k]||{lat:p.g.lat,lng:p.g.lng,place:p.g.place,people:[]}).people.push(p); });
   const G=Object.values(groups).sort((a,b)=>b.people.length-a.people.length);
-  const countries=new Set(G.map(g=>g.place.split(', ').pop()));
+  const countries=new Set(G.map(g=>/\(town not given\)$/.test(g.place)?'United States':g.place.split(', ').pop()));
   cnt.textContent = pts.length ? `${pts.length} on the globe · ${G.length} ${G.length===1?'city':'cities'} · ${countries.size} ${countries.size===1?'country':'countries'}` : 'No pins yet. Claim your card and add your city to be the first.';
   const who=p=>{ const q=byId[p.id], im=pic(q); return `${im?`<img src="${esc(im)}" alt="" loading="lazy">`:'<span class="ph0"></span>'}<span>${esc(q.name)}<small>${q.staff?'Faculty & Staff':'Class of '+esc(q.cls)}</small></span>`; };
   list.innerHTML=G.map(g=>`<div class="gc"><b>${esc(g.place)}</b>${g.people.map(p=>`<button data-id="${p.id}">${who(p)}</button>`).join('')}</div>`).join('');
