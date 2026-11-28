@@ -222,6 +222,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
 .notme:hover{background:#b33;color:#fff}
 .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--brass);color:var(--navy);padding:8px 14px;border-radius:3px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
 .toast.on{opacity:1}
+.globe-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin:14px 0}.globe-list .gc{background:var(--navy-2);border:1px solid #2a3756;border-radius:4px;padding:8px 10px}.globe-list .gc b{display:block;color:var(--brass);font-size:14px}.globe-list .gc button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.3;padding:4px 0}.globe-list .gc img,.globe-list .gc .ph0{width:40px;height:50px;object-fit:cover;flex:none;border:1px solid rgba(255,255,255,.2);background:#0b1220}.globe-list .gc button span small{display:block}.gtip .gp{display:flex;align-items:center;gap:8px;margin-top:4px}.gtip img{width:30px;height:38px;object-fit:cover;border:1px solid rgba(255,255,255,.25)}.globe-list .gc button:hover{color:var(--brass)}.globe-list .gc small{opacity:.7}.gpin{position:relative;transform:translate(-50%,-50%);cursor:pointer;transition:opacity .25s}.gpin .face{display:block;width:30px;height:30px;border-radius:50%;overflow:hidden;border:2px solid var(--brass);background:#0b1220;box-shadow:0 0 0 2px rgba(5,8,15,.8),0 0 14px rgba(212,166,74,.75)}.gpin .face img{width:100%;height:100%;object-fit:cover;object-position:50% 25%}.gpin:hover .face{transform:scale(1.35);transition:transform .15s}.gpin .n{position:absolute;right:-7px;top:-7px;background:var(--brass);color:var(--navy);font:700 11px/1 var(--body);padding:3px 5px;border-radius:9px;border:1px solid #05080f}.gpin .pulse{pointer-events:none;position:absolute;inset:-6px;border-radius:50%;border:1px solid rgba(212,166,74,.6);animation:gpulse 2.4s ease-out infinite}@keyframes gpulse{from{transform:scale(.7);opacity:1}to{transform:scale(1.8);opacity:0}}.gpin .tip{position:absolute;left:50%;bottom:calc(100% + 10px);transform:translateX(-50%);display:none;white-space:nowrap;z-index:5}.gpin:hover .tip{display:block}.gpin.hq{cursor:default;display:flex;flex-direction:row-reverse;align-items:center;gap:6px;transform:translate(calc(-100% + 5px),-50%);pointer-events:none!important;z-index:0}.gpin .hqdot{width:10px;height:10px;transform:rotate(45deg);background:#fff3d6;box-shadow:0 0 12px 3px rgba(255,220,150,.9)}.gpin .hqlbl{font:700 11px/1 var(--body);letter-spacing:.12em;color:#fff3d6;text-shadow:0 0 6px #000}.gtip{background:rgba(16,26,46,.92);border:1px solid var(--brass-dim);padding:6px 9px;border-radius:3px;font:13px/1.35 var(--body);color:var(--ink)}.gtip b{color:var(--brass)}
 
 @media (max-width:760px){
   .hero{grid-template-columns:1fr}
@@ -242,6 +243,7 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
     <a href="#coming" data-v="coming">Who's Coming</a>
     <a href="#faculty" data-v="faculty">Faculty &amp; Staff</a>
     <a href="#circle" data-v="circle">Knight's Circle</a>
+    <a href="#globe" data-v="globe">The Globe</a>
   </nav>
   <div class="proto">NYMA Reunion · <b style="color:var(--brass)">May 14–16, 2027</b></div>
 </header>
@@ -339,6 +341,13 @@ footer.site{max-width:1200px;margin:0 auto;padding:24px;border-top:1px solid #26
       <p class="note">Already have a card in the yearbooks? Open it and tap <b>Join the Knight's Circle</b> so your photo goes with your name.</p>
     </div>
     <div id="circleList"></div>
+  </section>
+
+  <section id="v-globe" hidden>
+    <div class="bar" style="justify-content:space-between"><p class="note" style="margin:0">Where NYMA cadets and faculty are now. Every pin is someone who claimed their card and told us their city. Claim yours to add your pin.</p></div>
+    <div class="ccount" id="globeCount"></div>
+    <div id="globeBox" style="position:relative;width:100%;height:min(72vh,640px,110vw);border-radius:6px;overflow:hidden;background:#05080f"></div>
+    <div id="globeList" class="globe-list"></div>
   </section>
 </main>
 <footer class="site">
@@ -534,8 +543,8 @@ function openForm(id, kind){
   if (kind==='note') return openNote(id);
   const p = byId[id], me = kind==='me';
   if (me) {
-    document.getElementById('card').innerHTML = formShell(p, 'Claim your entry', p.name, 'Your city, work and link show on your card within a few minutes. Email and phone stay private. Add your email and we\'ll send you a daily summary when someone posts on your wall or on a wall you\'ve posted on.',
-      sel('m_rsvp','Coming to the reunion, May 14–16, 2027? (optional)',['Not sure yet','Yes','Maybe','No']) + inp('m_city','Where you live now') + inp('m_work','What you do') +
+    document.getElementById('card').innerHTML = formShell(p, 'Claim your entry', p.name, 'Your city, work and link show on your card within a few minutes, and your city puts your pin on the NYMA Globe. Email and phone stay private. Add your email and we\'ll send you a daily summary when someone posts on your wall or on a wall you\'ve posted on.',
+      sel('m_rsvp','Coming to the reunion, May 14–16, 2027? (optional)',['Not sure yet','Yes','Maybe','No']) + inp('m_city','Where you live now (city, state or country). Shows on the NYMA Globe') + inp('m_work','What you do') +
       inp('m_link','Your LinkedIn, Facebook or other link') + inp('m_note','Anything for the class',{ta:1}) + circleFields() + contactFields(), 'Send it');
     bindForm(out => {
       const det = [['Coming',g('m_rsvp')==='Not sure yet'?'':g('m_rsvp')],['City',g('m_city')],['Work',g('m_work')],['Link',g('m_link')], ...circleDet()].filter(x=>x[1]).map(x=>x.join(': ')).join('\n');
@@ -782,6 +791,7 @@ async function loadApproved(){
   stats(); renderWall(); renderFind(); renderFeed();
   if (!document.getElementById('v-coming').hidden) renderComing();
   if (!document.getElementById('v-circle').hidden) renderCircle();
+  if (!document.getElementById('v-globe').hidden) renderGlobe();
   if (dlg.open && dlg.dataset.id && byId[dlg.dataset.id] && !document.getElementById('f')) openCard(dlg.dataset.id);
 }
 function renderFeed(){
@@ -899,8 +909,8 @@ function renderFaculty(){
 }
 function show(v){
   document.body.dataset.v = v;
-  ['wall','book','coming','faculty','circle'].forEach(x => document.getElementById('v-'+x).hidden = x!==v);
-  document.getElementById('hero').hidden = v==='book' || v==='coming' || v==='circle';
+  ['wall','book','coming','faculty','circle','globe'].forEach(x => document.getElementById('v-'+x).hidden = x!==v);
+  document.getElementById('hero').hidden = v==='book' || v==='coming' || v==='circle' || v==='globe';
   document.getElementById('who').hidden = !(v==='wall' || v==='faculty');
   document.getElementById('years').hidden = !(v==='wall' || v==='faculty');
   document.querySelectorAll('[data-who]').forEach(a => a.setAttribute('aria-selected', a.dataset.who===v));
@@ -908,14 +918,67 @@ function show(v){
   if (v==='coming') renderComing();
   if (v==='circle') renderCircle();
   if (v==='faculty') renderFaculty();
+  if (v==='globe') renderGlobe();
   document.querySelectorAll('nav a').forEach(a => a.toggleAttribute('aria-current', a.dataset.v===v) || a.dataset.v===v && a.setAttribute('aria-current','page'));
   document.querySelectorAll('nav a').forEach(a => { if (a.dataset.v===v) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
   if (v==='book') renderSpread();
 }
+
+// ---- The Globe: pins for claimed cards that list a City (approved rows only) ----
+const US_ST={AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',DC:'District of Columbia',PR:'Puerto Rico'};
+let NGLOBE=null, NGLOBE_LOADING=null;
+function gstore(k,v){ try{ if(v===undefined) return JSON.parse(localStorage.getItem(k)||'null'); localStorage.setItem(k,JSON.stringify(v)); }catch(e){ return null; } }
+async function geocode(city){
+  const key='geo1:'+city.toLowerCase().trim(), hit=gstore(key); if (hit) return hit.lat==null?null:hit;
+  const parts=city.split(',').map(x=>x.trim()).filter(Boolean); if(!parts.length) return null;
+  const hint=parts.slice(1).join(' ').replace(/\./g,'').trim(), hintU=hint.toUpperCase(), full=(US_ST[hintU]||hint).toLowerCase();
+  let res=[]; try{ const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?count=10&language=en&format=json&name='+encodeURIComponent(parts[0])); res=(await r.json()).results||[]; }catch(e){ return null; }
+  const score=x=>{ let s=Math.log10((x.population||1)+1); if(full){ const a=[x.admin1,x.country,x.country_code].join(' ').toLowerCase(); if(a.includes(full)) s+=20; if(hintU.length===2 && x.country_code===hintU) s+=15; if(US_ST[hintU] && x.country_code==='US') s+=5; } return s; };
+  res.sort((a,b)=>score(b)-score(a)); const b=res[0];
+  const out=b?{lat:b.latitude,lng:b.longitude,place:[b.name,b.admin1,b.country].filter(Boolean).join(', ')}:{lat:null};
+  gstore(key,out); return b?out:null;
+}
+function loadGlobeLib(){ return NGLOBE_LOADING || (NGLOBE_LOADING=new Promise((ok,no)=>{ const sc=document.createElement('script'); sc.src='vendor/globe.gl.min.js'; sc.onload=ok; sc.onerror=no; document.head.appendChild(sc); })); }
+async function renderGlobe(){
+  const box=document.getElementById('globeBox'), list=document.getElementById('globeList'), cnt=document.getElementById('globeCount');
+  const ppl=Object.entries(NOW).filter(([id,n])=>byId[id] && n.City && String(n.City).trim()).map(([id,n])=>({id,city:String(n.City).trim()}));
+  const pts=(await Promise.all(ppl.map(async p=>({...p,g:await geocode(p.city)})))).filter(p=>p.g);
+  const groups={}; pts.forEach(p=>{ const k=p.g.lat.toFixed(2)+','+p.g.lng.toFixed(2); (groups[k]=groups[k]||{lat:p.g.lat,lng:p.g.lng,place:p.g.place,people:[]}).people.push(p); });
+  const G=Object.values(groups).sort((a,b)=>b.people.length-a.people.length);
+  const countries=new Set(G.map(g=>g.place.split(', ').pop()));
+  cnt.textContent = pts.length ? `${pts.length} on the globe · ${G.length} ${G.length===1?'city':'cities'} · ${countries.size} ${countries.size===1?'country':'countries'}` : 'No pins yet. Claim your card and add your city to be the first.';
+  const who=p=>{ const q=byId[p.id], im=pic(q); return `${im?`<img src="${esc(im)}" alt="" loading="lazy">`:'<span class="ph0"></span>'}<span>${esc(q.name)}<small>${q.staff?'Faculty & Staff':'Class of '+esc(q.cls)}</small></span>`; };
+  list.innerHTML=G.map(g=>`<div class="gc"><b>${esc(g.place)}</b>${g.people.map(p=>`<button data-id="${p.id}">${who(p)}</button>`).join('')}</div>`).join('');
+  try{ await loadGlobeLib(); }catch(e){ return; }
+  const HQ={lat:41.445,lng:-74.016};
+  const tipHtml=g=>`<div class="gtip"><b>${esc(g.place)}</b>${g.people.slice(0,8).map(p=>{ const q=byId[p.id], im=pic(q); return `<div class="gp">${im?`<img src="${esc(im)}" alt="">`:''}<span>${esc(q.name)}${q.staff?'':' ’'+esc(String(q.cls).slice(-2))}</span></div>`; }).join('')}${g.people.length>8?`<div class="gp">+${g.people.length-8} more</div>`:''}</div>`;
+  const pinEl=g=>{
+    if(g.hq){ const el=document.createElement('div'); el.className='gpin hq'; el.innerHTML='<span class="hqdot" title="NYMA, Cornwall-on-Hudson"></span>'; return el; }
+    const q=byId[g.people[0].id], im=pic(q), el=document.createElement('div'); el.className='gpin';
+    el.innerHTML=`<span class="pulse"></span><span class="face">${im?`<img src="${esc(im)}" alt="">`:''}</span>${g.people.length>1?`<span class="n">${g.people.length}</span>`:''}<span class="tip">${tipHtml(g)}</span>`;
+    el.addEventListener('click',()=>{ if(g.people.length===1) location.hash=g.people[0].id; else { const c=[...list.children].find(c=>c.querySelector('b').textContent===g.place); if(c){ c.scrollIntoView({behavior:'smooth',block:'center'}); c.style.outline='2px solid var(--brass)'; setTimeout(()=>c.style.outline='',2000);} } });
+    return el; };
+  if(!NGLOBE){
+    NGLOBE=new Globe(box,{animateIn:true}).globeImageUrl('img/globe/earth-night.jpg').bumpImageUrl('img/globe/earth-topology.png').backgroundColor('#05080f')
+      .atmosphereColor('#d4a64a').atmosphereAltitude(0.16)
+      .htmlElement(pinEl).htmlAltitude(0.01).htmlElementVisibilityModifier((el,v)=>{ el.style.opacity=v?1:0; el.style.pointerEvents=v?'auto':'none'; })
+      .arcStartLat(()=>HQ.lat).arcStartLng(()=>HQ.lng).arcEndLat(g=>g.lat).arcEndLng(g=>g.lng)
+      .arcColor(()=>['rgba(212,166,74,0.9)','rgba(212,166,74,0.15)']).arcStroke(0.35).arcAltitudeAutoScale(0.45)
+      .arcDashLength(0.35).arcDashGap(0.65).arcDashInitialGap(()=>Math.random()).arcDashAnimateTime(2600)
+      .ringLat(g=>g.lat).ringLng(g=>g.lng).ringColor(()=>t=>`rgba(212,166,74,${0.7*(1-t)})`).ringMaxRadius(2.2).ringPropagationSpeed(1.2).ringRepeatPeriod(2200);
+    NGLOBE.controls().autoRotate=true; NGLOBE.controls().autoRotateSpeed=0.45;
+    box.addEventListener('pointerdown',()=>{ NGLOBE.controls().autoRotate=false; });
+    NGLOBE.pointOfView({lat:38,lng:-40,altitude:box.clientWidth<600?2.5:2.2});
+    const fit=()=>NGLOBE.width(box.clientWidth).height(box.clientHeight); fit(); requestAnimationFrame(fit); addEventListener('resize',fit);
+  }
+  const far=G.filter(g=>Math.hypot(g.lat-HQ.lat,g.lng-HQ.lng)>0.3);
+  NGLOBE.htmlElementsData([{...HQ,hq:1},...G]).arcsData(far).ringsData([HQ,...G]);
+}
+document.addEventListener('click',e=>{ const b=e.target.closest('#globeList [data-id]'); if(b) location.hash=b.dataset.id; });
 function route(){
   const h = decodeURIComponent(location.hash.slice(1));
   if (byId[h]) { show('wall'); openCard(h); return; }
-  show(['wall','book','coming','faculty','circle'].includes(h) ? h : 'wall');
+  show(['wall','book','coming','faculty','circle','globe'].includes(h) ? h : 'wall');
 }
 window.addEventListener('hashchange', route);
 function turnPage(d){
